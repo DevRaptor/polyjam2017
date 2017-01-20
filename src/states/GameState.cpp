@@ -6,6 +6,8 @@
 #include "entity/Ship.h"
 #include "utility/Log.h"
 
+#include "modules/GameModule.h"
+
 GameState::GameState()
 {
 	meteor_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;

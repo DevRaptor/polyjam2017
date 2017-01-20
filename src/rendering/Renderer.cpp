@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
-#include "GameModule.h"
+#include "modules/GameModule.h"
 #include "utility/Log.h"
 
 Renderer::Renderer(int resolution_x, int resolution_y)

@@ -1,4 +1,4 @@
-#include "GameModule.h"
+#include "modules/GameModule.h"
 
 #include <ctime>
 

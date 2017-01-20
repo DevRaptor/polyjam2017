@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <chrono>
 
-#include "GameModule.h"
+#include "modules/GameModule.h"
 #include "utility/Log.h"
 
 using namespace std::chrono_literals;

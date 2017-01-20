@@ -8,7 +8,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 
-#include "GameState.h"
+#include "states/GameState.h"
 
 #include "rendering/Mesh.h"
 #include "rendering/ShaderProgram.h"

@@ -4,7 +4,7 @@ Meteor::Meteor(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 sta
 	: Entity(world_ptr, start_pos, scale)
 {
 	type = EntityType::METEOR;
-	mesh = GameModule::resources->GetMesh("cube");
+	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
 }
 
 void Meteor::Init()

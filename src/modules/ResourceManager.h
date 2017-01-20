@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-class Mesh;
+#include <rendering/Mesh.h>
 
 class ResourceManager
 {

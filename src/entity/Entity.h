@@ -6,7 +6,7 @@
 #include <btBulletDynamicsCommon.h>
 
 #include "rendering/Mesh.h"
-#include "GameModule.h"
+#include "modules/GameModule.h"
 #include "entity/PhysicBody.h"
 
 //EntityType declaration in PhysicBody

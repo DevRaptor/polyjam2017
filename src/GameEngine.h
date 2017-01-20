@@ -5,7 +5,7 @@
 #include <SDL.h>
 #include <glm/glm.hpp>
 
-#include "GameState.h"
+#include "states/GameState.h"
 #include "rendering/Renderer.h"
 
 
