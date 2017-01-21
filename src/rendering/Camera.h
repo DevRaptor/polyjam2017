@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <chrono>
 
 class Camera
 {
@@ -13,6 +14,8 @@ public:
 	void Update();
 	void Translate(glm::vec3 position);
 	void LookAt(glm::vec3 position);
+	void Shake();
+	void StartShaking();
 
 private:
 	glm::mat4 projection;
@@ -32,4 +35,7 @@ private:
 
 	void Move(const glm::vec3& direction);
 	void Rotate(const glm::quat &rot);
+
+	bool isShaking;
+	std::chrono::high_resolution_clock::time_point shakeStartTime;
 };

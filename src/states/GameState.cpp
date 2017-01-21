@@ -163,6 +163,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	if (players.size() > 0)
 	{
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
+		camera.Shake();
 		//camera.LookAt(players.front()->GetPosition());
 	}
 
@@ -384,6 +385,7 @@ void GameState::CheckTriggers()
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();
+					camera.StartShaking();
 				}
 
 				if (obj1->GetType() == EntityType::EXPLOSION
@@ -391,6 +393,7 @@ void GameState::CheckTriggers()
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();
+					camera.StartShaking();
 				}
 			}
 		}

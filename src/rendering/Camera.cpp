@@ -5,7 +5,7 @@
 #include "modules/GameModule.h"
 
 Camera::Camera(float fov, float near, float far)
-	: view(1.0f)
+	: view(1.0f), shakeStartTime{ std::chrono::high_resolution_clock::now() }, isShaking{ false }
 {
 	move_speed = GameModule::resources->GetFloatParameter("camera_move_speed");
 	rotation_speed = GameModule::resources->GetFloatParameter("camera_rotation_speed");
@@ -93,4 +93,19 @@ void Camera::LookAt(glm::vec3 position)
 {
 	observedObjectsPosition = position;
 	view = glm::lookAt(this->position, observedObjectsPosition, glm::vec3(-1, 0, 0));
+}
+
+void Camera::Shake()
+{
+	if (isShaking && (shakeStartTime + std::chrono::milliseconds(1000) > std::chrono::high_resolution_clock::now()))
+	{
+		std::uniform_real_distribution<double> random(0, 1.0);
+		position = position + glm::vec3(random(GameModule::random_gen), random(GameModule::random_gen), random(GameModule::random_gen));
+	}
+}
+
+void Camera::StartShaking()
+{
+	isShaking = true;
+	shakeStartTime = std::chrono::high_resolution_clock::now();
 }
