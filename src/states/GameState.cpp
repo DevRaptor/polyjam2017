@@ -120,6 +120,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
 			}
 
+			players[activeplayerid]->points += (*it)->points;
 			it = entities.erase(it);
 		}
 		else
