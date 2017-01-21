@@ -12,7 +12,7 @@ Camera::Camera(float fov, float near, float far)
 	float resolution_y = GameModule::resources->GetIntParameter("resolution_y");
 	float ratio = resolution_x / resolution_y;
 
-	position = glm::vec3(1, 1, 0),
+	position = glm::vec3(1, 1, 0);
 
 	projection = glm::perspective(glm::radians(fov), ratio, near, far);
 }

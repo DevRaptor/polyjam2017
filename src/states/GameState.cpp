@@ -43,7 +43,25 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	auto it = entities.begin();
+	auto it = players.begin();
+	while (it != players.end())
+	{
+		if ((*it)->IsDestroyed())
+		{
+			it = players.erase(it);
+		}
+		else
+		{
+			(*it)->Update();
+
+			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+
+			++it;
+		}
+	}
+
+
+	it = entities.begin();
 	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
@@ -54,7 +72,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			(*it)->Update();
 
-			//dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
 
 			++it;
 		}
@@ -106,7 +124,7 @@ void GameState::InitGameplay()
 
 	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
 	obj->Init();
-	entities.push_back(obj);
+	players.push_back(obj);
 }
 
 void GameState::RestartGameplay()
