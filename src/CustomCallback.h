@@ -17,6 +17,13 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 		const RigidBody* own_obj1 = static_cast<const RigidBody*>(obj1->getCollisionObject());
 
 		//bullet can collide only with meteor, so must add point
+		
+		if (own_obj0->GetType() != EntityType::BULLET
+			&& own_obj1->GetType() != EntityType::BULLET)
+		{
+			return 0;
+		}
+
 		if (own_obj0->GetType()  == EntityType::BULLET)
 			Ship::points++;
 		else if(own_obj1->GetType() == EntityType::BULLET)

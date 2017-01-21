@@ -8,7 +8,7 @@
 
 #include "modules/GameModule.h"
 
-GameState::GameState() : camera{90, 0.1, 100}
+GameState::GameState() : camera{ 90, 0.1, 100 }
 {
 	obstacle_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;
 	obstacle_data.pos_z = GameModule::resources->GetFloatParameter("camera_pos_y") / 2.0f;
@@ -28,8 +28,8 @@ GameState::GameState() : camera{90, 0.1, 100}
 	dynamic_world = std::make_shared<btDiscreteDynamicsWorld>(dispatcher.get(), broad_phase.get(),
 		solver.get(), collision_config.get());
 
-	dynamic_world->setGravity(btVector3(0, -10, 0));
-	
+	dynamic_world->setGravity(btVector3(0, 0, 0));
+
 	AddFloor();
 
 	InitGameplay();
@@ -45,7 +45,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	
+
 
 	static std::chrono::high_resolution_clock::time_point switchtimer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_SLASH)
@@ -95,28 +95,39 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			players[i]->Update();
 
-			//dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
+			dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
 		}
 	}
 
+	std::vector<btVector3> explosion_positions;
 
 	auto it = entities.begin();
 	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
 		{
+			if ((*it)->GetType() == EntityType::OBSTACLE)
+			{
+				explosion_positions.push_back((*it)->GetPhysicPosition());
+			}
+
 			it = entities.erase(it);
 		}
 		else
 		{
 			(*it)->Update();
 
-			//dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
 
 			++it;
 		}
 	}
 
+
+	for (auto& pos : explosion_positions)
+	{
+		Explosion(pos);
+	}
 
 	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_R)
@@ -169,7 +180,7 @@ void GameState::SpawnObstacles()
 			{
 				glm::vec3 pos(start_x + i * object_size, 0, start_z + j * object_size);
 
-				auto obj = std::make_shared<Obstacle>(dynamic_world, pos, scale);
+				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE, dynamic_world, pos, scale);
 				obj->Init();
 				entities.push_back(obj);
 			}
@@ -228,4 +239,14 @@ void GameState::RestartGameplay()
 	entities.clear();
 
 	InitGameplay();
+}
+
+void GameState::Explosion(btVector3& pos)
+{
+
+	auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
+		glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+	obj->Init();
+	entities.push_back(obj);
+
 }
