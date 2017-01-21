@@ -106,7 +106,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		if ((*it)->IsDestroyed())
 		{
-			if ((*it)->GetType() == EntityType::OBSTACLE_HEAVY)
+			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
 				explosion_positions.push_back((*it)->GetPhysicPosition());
 			}

@@ -11,7 +11,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	else if (type == EntityType::OBSTACLE_LIGHT)
 		mesh = GameModule::resources->GetMesh("teapot");
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
-		mesh = GameModule::resources->GetMesh("teapot");
+		mesh = GameModule::resources->GetMesh("obstacle_explosive");
 	else if (type == EntityType::PARTICLE)
 		mesh = GameModule::resources->GetMesh("particle");
 	else if (type == EntityType::EXPLOSION)
