@@ -81,9 +81,10 @@ private:
 	} obstacle_data;
 
 	void SpawnObstacles();
+	void CheckTriggers();
 
 	void InitGameplay();
 	void RestartGameplay();
 
-	void Explosion(btVector3& pos);
+	void Explosion(btVector3& pos, double radius);
 };

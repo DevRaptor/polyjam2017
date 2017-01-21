@@ -2,6 +2,8 @@
 
 #include "Bullet.h"
 #include <math.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
@@ -157,12 +159,33 @@ void Ship::Shoot()
 	btTransform transform;
 	physic_body->body->getMotionState()->getWorldTransform(transform);
 
-	btVector3 vec = transform.getOrigin();
-	vec.setX(vec.getX() - 2.0f);
-	glm::vec3 pos(vec.getX(), vec.getY(), vec.getZ());
+	auto rotation = transform.getRotation();
+	
 
-	auto bullet = std::make_shared<Bullet>(world.lock(), pos, glm::vec3(0.3f, 0.3f, 0.3f));
+
+	btVector3 vec = transform.getOrigin();
+	
+
+	glm::vec3 up(-1, 0, 0);
+
+	double angleRot = angle;
+	std::cout << glm::degrees(angleRot) << "\n";
+
+	glm::vec3 direction;
+	direction[1] = 0;
+	direction[2] = up[2] * cos(angleRot) - up[0] * sin(angleRot);
+	direction[0] = up[2] * sin(angleRot) + up[0] * cos(angleRot);
+	glm::normalize(direction);
+
+	std::cout << direction[0] << " " << direction[1] << " " << direction[2] << "\n";
+
+	glm::vec3 pos(vec.getX() + 2*direction[0], vec.getY(), vec.getZ() + 2*direction[2]);
+
+	auto bullet = std::make_shared<Bullet>(world.lock(), pos, glm::vec3(0.3f, 0.3f, 0.3f), glm::vec2(direction[2], direction[0]));
 	bullet->Init();
+
+
+
 
 	bullets.push_back(bullet);
 }

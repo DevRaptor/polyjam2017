@@ -59,7 +59,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (blockinput && DestructionsEnded())
 	{
-		//fade in
+		//fade in effect
 		NextPlayer();
 	}
 
@@ -108,18 +108,16 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		}
 	}
 
-	std::vector<btVector3> explosion_positions;
+	std::vector<std::pair<btVector3, double >> explosion_positions;
 
 	auto it = entities.begin();
 	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
 		{
-			if ((*it)->GetType() == EntityType::OBSTACLE)
+			if ((*it)->GetType() == EntityType::OBSTACLE_HEAVY)
 			{
-				explosion_positions.push_back((*it)->GetPhysicPosition());
-
-				players[activeplayerid]->points += (*it)->points; //should be in function lol
+				explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
 			}
 
 			it = entities.erase(it);
@@ -137,7 +135,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	for (auto& pos : explosion_positions)
 	{
-		Explosion(pos);
+		Explosion(pos.first, pos.second);
 	}
 
 	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
@@ -167,6 +165,8 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		//camera.LookAt(players.front()->GetPosition());
 	}
+
+	CheckTriggers();
 }
 
 void GameState::NextPlayer()
@@ -196,9 +196,7 @@ void GameState::ResetDestructTimer()
 }
 
 bool GameState::DestructionsEnded()
-{
-	
-	
+{	
 	if (std::chrono::high_resolution_clock::now() > destruct_timer)
 	{
 		destruct_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(3);
@@ -210,42 +208,77 @@ bool GameState::DestructionsEnded()
 
 void GameState::SpawnObstacles()
 {
-
 	/*
 	x goes from 0 and below
 	don't touch y
 	z goes wherever you want
 	0,0,0 is player spawn - don't spawn here
 	*/
-	int obstacles_amount_per_wall = 100;
+	int obstacles_amount_per_wall = 30;
 
-	float min_x = -35;
-	float max_x = -8;
-	float min_z = -35;
-	float max_z = -8;
+	// How far from each side from any player obstacles can't spawn
+	float player_safe_space_size = 5;
+
 
 	float object_size = 3;
 
-	std::uniform_real_distribution<> random_spawn_start_x(min_x, max_x);
-	std::uniform_real_distribution<> random_spawn_start_z(min_z, max_z);
+	int no_spawn_chance = 20;
+	int light_spawn_chance = 10;
+	int heavy_spawn_chance = 10;
+	int expl_spawn_chance = 10;
 
-	float start_x = random_spawn_start_x(GameModule::random_gen);
-	float start_z = random_spawn_start_z(GameModule::random_gen);
+	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
 
 	glm::vec3 scale(1, 1, 1);
 
+
+	static const double explosionRadius = 5;
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
 		for (int j = 0; j <= obstacles_amount_per_wall; j++)
 		{
-			if (i == 0 || i == obstacles_amount_per_wall
-				|| j == 0 || j == obstacles_amount_per_wall)
-			{
-				glm::vec3 pos(start_x + i * object_size, 0, start_z + j * object_size);
+			bool is_position_near_player = false;
 
-				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE, dynamic_world, pos, scale);
-				obj->Init();
-				entities.push_back(obj);
+			float current_x = -20 + i * object_size;
+			float current_z = -20 + j * object_size;
+
+			for (std::size_t i = 0; i < players.size(); ++i)
+			{
+				glm::vec3 player_pos = players[i]->GetPosition();
+				if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
+					|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
+				{
+					is_position_near_player = true;
+					break;
+				}
+
+			}
+			if (!is_position_near_player)
+			{
+				glm::vec3 pos(current_x, 0, current_z);
+
+				int rand_obstacle_type = random_spawner(GameModule::random_gen);
+
+				if (rand_obstacle_type < expl_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
+				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
+				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
+
+
 			}
 		}
 	}
@@ -272,7 +305,6 @@ void GameState::InitGameplay()
 
 void GameState::AddFloor()
 {
-
 	groundShape = std::make_shared<btStaticPlaneShape>(btVector3(0, 1, 0), 0);
 
 	groundMotionState = std::make_shared<btDefaultMotionState>(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
@@ -310,12 +342,56 @@ void GameState::RestartGameplay()
 	InitGameplay();
 }
 
-void GameState::Explosion(btVector3& pos)
+void GameState::Explosion(btVector3& pos, double radius)
 {
+	for (int i = 0; i < 5; i++)
+	{
+		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
+			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1), 0);
+		obj->Init();
+		entities.push_back(obj);
+	}
 
-	auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-		glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(radius, radius, radius), 0);
 	obj->Init();
 	entities.push_back(obj);
-
 }
+
+void GameState::CheckTriggers()
+{
+	int numManifolds = dynamic_world->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = dynamic_world->getDispatcher()->getManifoldByIndexInternal(i);
+		auto  obA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
+		auto  obB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
+
+		int numContacts = contactManifold->getNumContacts();
+		for (int j = 0; j < numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance() < 0.f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
+
+				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
+				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
+
+				if (obj0->GetType() == EntityType::EXPLOSION && obj1->GetType() == EntityType::OBSTACLE_HEAVY)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}
+
+				if (obj1->GetType() == EntityType::EXPLOSION && obj0->GetType() == EntityType::OBSTACLE_HEAVY)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}
+			}
+		}
+	}
+}
+
