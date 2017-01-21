@@ -8,8 +8,7 @@
 
 #include "modules/GameModule.h"
 
-GameState::GameState()
-	: camera{90, 0.1, 100}
+GameState::GameState() : camera{90, 0.1, 100}
 {
 	obstacle_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;
 	obstacle_data.pos_z = GameModule::resources->GetFloatParameter("camera_pos_y") / 2.0f;
@@ -46,14 +45,25 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	auto it = players.begin();
-	while (it != players.end())
+	
+
+	static std::chrono::high_resolution_clock::time_point switchtimer = std::chrono::high_resolution_clock::now();
+	if (GameModule::input->GetKeyState(SDL_SCANCODE_SLASH)
+		&& (std::chrono::high_resolution_clock::now() > switchtimer))
 	{
-		if ((*it)->index == activeplayerid)
+		++activeplayerid;
+		activeplayerid %= players.size();
+
+		switchtimer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+	}
+
+	for (std::size_t i = 0; i < players.size(); ++i)
+	{
+		if (i == activeplayerid)
 		{
 			if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
 			{
-				(*it)->DoShoot();
+				players[i]->DoShoot();
 			}
 
 			btVector3* tempvec = new btVector3(0, 0, 0);
@@ -72,26 +82,25 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				GameModule::input->GetKeyState(SDL_SCANCODE_RIGHT))
 				tempvec->setZ(-1);
 
-			(*it)->Move(tempvec);
+			players[i]->Move(tempvec);
 		}
 
 
-		if ((*it)->IsDestroyed())
+		if (players[i]->IsDestroyed())
 		{
-			it = players.erase(it);
+			players.erase(players.begin() + i);
+			--i;
 		}
 		else
 		{
-			(*it)->Update();
+			players[i]->Update();
 
-			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
-
-			++it;
+			dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
 		}
 	}
 
 
-	it = entities.begin();
+	auto it = entities.begin();
 	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
@@ -109,17 +118,6 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	}
 
 
-	if (std::chrono::high_resolution_clock::now() > obstacle_data.timer)
-	{
-		SpawnObstacle();
-		obstacle_data.timer = std::chrono::high_resolution_clock::now() + obstacle_data.delay;
-	}
-
-	//change Obstacle delay time when player destroyed Obstacles
-	int delay = obstacle_data.default_delay - (100 * Ship::points);
-	obstacle_data.delay = std::chrono::milliseconds(delay > obstacle_data.min_delay ? delay : obstacle_data.min_delay);
-
-
 	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_R)
 		&& (std::chrono::high_resolution_clock::now() > restart_timer))
@@ -129,38 +127,67 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
-	/*if (players.size() > 0)
+	if (players.size() > 0)
 	{
-		camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
-		camera.LookAt(players.front()->GetPosition());
-	}*/
+		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
+		//camera.LookAt(players.front()->GetPosition());
+	}
 }
 
-void GameState::SpawnObstacle()
+void GameState::SpawnObstacles()
 {
-	std::uniform_real_distribution<> random_distortion(1.0f, obstacle_data.distortion);
-	std::uniform_real_distribution<> random_scale(obstacle_data.scale_min, obstacle_data.scale_max);
-	float size = random_scale(GameModule::random_gen);
 
-	glm::vec3 scale(size, size, size * random_distortion(GameModule::random_gen));
+	/*
+	x goes from 0 and below
+	don't touch y
+	z goes wherever you want
+	0,0,0 is player spawn - don't spawn here
+	*/
+	int obstacles_amount_per_wall = 100;
 
-	std::uniform_real_distribution<> rand_pos_z(-obstacle_data.pos_z, obstacle_data.pos_z);
+	float min_x = -35;
+	float max_x = -8;
+	float min_z = -35;
+	float max_z = -8;
 
-	//must lower Obstacle position by half of size
-	glm::vec3 pos(obstacle_data.pos_x, -size / 2.0f, rand_pos_z(GameModule::random_gen));
+	float object_size = 3;
 
-	auto obj = std::make_shared<Obstacle>(dynamic_world, pos, scale);
-	obj->Init();
-	entities.push_back(obj);
+	std::uniform_real_distribution<> random_spawn_start_x(min_x, max_x);
+	std::uniform_real_distribution<> random_spawn_start_z(min_z, max_z);
+
+	float start_x = random_spawn_start_x(GameModule::random_gen);
+	float start_z = random_spawn_start_z(GameModule::random_gen);
+
+	glm::vec3 scale(1, 1, 1);
+
+	for (int i = 0; i <= obstacles_amount_per_wall; i++)
+	{
+		for (int j = 0; j <= obstacles_amount_per_wall; j++)
+		{
+			if (i == 0 || i == obstacles_amount_per_wall
+				|| j == 0 || j == obstacles_amount_per_wall)
+			{
+				glm::vec3 pos(start_x + i * object_size, 0, start_z + j * object_size);
+
+				auto obj = std::make_shared<Obstacle>(dynamic_world, pos, scale);
+				obj->Init();
+				entities.push_back(obj);
+			}
+		}
+	}
 }
 
 void GameState::InitGameplay()
 {
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
-	AddPlayer();
-
+	for (int i = 0; i < 5; i++) //raptor said 4
+	{
+		AddPlayer(glm::vec3(i * 15, 0, i * 15));
+	}
 	activeplayerid = 0;
+
+	SpawnObstacles();
 }
 
 void GameState::AddFloor()
@@ -185,9 +212,9 @@ void GameState::AddFloor()
 
 }
 
-void GameState::AddPlayer()
+void GameState::AddPlayer(glm::vec3 startpos)
 {
-	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
+	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities);
 	obj->Init();
 	players.push_back(obj);
 	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));

@@ -3,7 +3,6 @@
 #include "Bullet.h"
 
 int Ship::points = 0;
-int Ship::indexer = 0;
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
@@ -14,7 +13,7 @@ Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_p
 	
 	points = 0;
 
-	index = indexer++;
+	//index = indexer++;
 
 	move_speed = GameModule::resources->GetFloatParameter("ship_move_speed");
 	move_damping = GameModule::resources->GetFloatParameter("ship_move_damping");
