@@ -75,5 +75,5 @@ private:
 	void InitGameplay();
 	void RestartGameplay();
 
-	void Explosion(btVector3& pos);
+	void Explosion(btVector3& pos, double radius);
 };

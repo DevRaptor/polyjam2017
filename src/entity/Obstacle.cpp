@@ -1,7 +1,7 @@
 #include "Obstacle.h"
 
-Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale)
-	: Entity(world_ptr, start_pos, scale)
+Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale, double initWaveRadius)
+	: Entity(world_ptr, start_pos, scale, initWaveRadius), spawnTime{ std::chrono::high_resolution_clock::now() }
 {
 	
 	type = obj_type;
@@ -47,4 +47,25 @@ void Obstacle::Init()
 void Obstacle::Update()
 {
 	transform_mat = physic_body->GetTransformMatrix();
+
+	//static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
+	if (type == EntityType::EXPLOSION)
+	{
+		if(std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(100))
+			Destroy();
+		else
+		{
+
+		}
+	}
+	else if (type == EntityType::PARTICLE)
+	{
+		if (std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(2000))
+			Destroy();
+		else
+		{
+
+		}
+	}
+
 }

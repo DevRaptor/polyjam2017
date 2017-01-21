@@ -99,7 +99,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		}
 	}
 
-	std::vector<btVector3> explosion_positions;
+	std::vector<std::pair<btVector3, double >> explosion_positions;
 
 	auto it = entities.begin();
 	while (it != entities.end())
@@ -108,7 +108,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			if ((*it)->GetType() == EntityType::OBSTACLE_HEAVY)
 			{
-				explosion_positions.push_back((*it)->GetPhysicPosition());
+				explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
 			}
 
 			it = entities.erase(it);
@@ -126,7 +126,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	for (auto& pos : explosion_positions)
 	{
-		Explosion(pos);
+		Explosion(pos.first, pos.second);
 	}
 
 	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
@@ -177,6 +177,8 @@ void GameState::SpawnObstacles()
 
 	glm::vec3 scale(1, 1, 1);
 
+	static const double explosionRadius = 5;
+
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
 		for (int j = 0; j <= obstacles_amount_per_wall; j++)
@@ -186,7 +188,7 @@ void GameState::SpawnObstacles()
 			{
 				glm::vec3 pos(start_x + i * object_size, 0, start_z + j * object_size);
 
-				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale);
+				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 				obj->Init();
 				entities.push_back(obj);
 			}
@@ -247,18 +249,18 @@ void GameState::RestartGameplay()
 	InitGameplay();
 }
 
-void GameState::Explosion(btVector3& pos)
+void GameState::Explosion(btVector3& pos, double radius)
 {
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1), 0);
 		obj->Init();
 		entities.push_back(obj);
 	}
 
-	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(3, 3, 3));
+	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(radius, radius, radius), 0);
 	obj->Init();
 	entities.push_back(obj);
 }
