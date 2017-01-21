@@ -45,21 +45,26 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	//TURNSYSTEM
+	//TURNSYSTEM - stateslike
 	
 	if ((std::chrono::high_resolution_clock::now() > playertimer) || players[activeplayerid]->AlreadyShot())
 	{
-		if (!blockinput)
+		if (!blockshooting)
 		{
-			blockinput = true;
+			blockshooting = true;
 			ResetDestructTimer();
 		}
 		//camera change to show destructions
 	}
 
-	if (blockinput && DestructionsEnded())
+	if (blockshooting && DestructionsEnded())
+	{		
+		FadeInEffect();
+	}
+
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
 	{
-		//fade in effect
+		fade = false;
 		NextPlayer();
 	}
 
@@ -67,9 +72,9 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		if (i == activeplayerid)
 		{
-			if (!blockinput) 
+			if (!blockinput)
 			{
-				if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+				if (GameModule::input->IsLeftMouseButtonPressed() && !blockshooting)
 				{
 					players[i]->DoShoot();
 				}
@@ -92,6 +97,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 				players[i]->Move(tempvec);
 			}
+			
 		}
 
 
@@ -117,11 +123,19 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
-				explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
+				
+				if (std::chrono::high_resolution_clock::now() > (*it)->GetTimeOfDeath() + std::chrono::milliseconds(GameModule::resources->GetIntParameter("explosion_delay")))
+				{
+					explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
+					players[activeplayerid]->points += (*it)->points;
+					it = entities.erase(it);
+				}
 			}
-
-			players[activeplayerid]->points += (*it)->points;
-			it = entities.erase(it);
+			else
+			{
+				players[activeplayerid]->points += (*it)->points;
+				it = entities.erase(it);
+			}
 		}
 		else
 		{
@@ -164,14 +178,22 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	if (players.size() > 0)
 	{
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
+		camera.Shake();
 		//camera.LookAt(players.front()->GetPosition());
 	}
 
 	CheckTriggers();
 }
 
+void GameState::FadeInEffect()
+{
+	blockinput = true;
+	fade = true;
+}
+
 void GameState::NextPlayer()
 {
+
 	if(activeplayerid != -1) //first iteration AccessViolation exception
 		players[activeplayerid]->QuitShooting();
 
@@ -182,6 +204,7 @@ void GameState::NextPlayer()
 
 	ResetTurnTimer();
 
+	blockshooting = false;
 	blockinput = false;
 }
 
@@ -345,7 +368,7 @@ void GameState::RestartGameplay()
 
 void GameState::Explosion(btVector3& pos, double radius)
 {
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < GameModule::resources->GetIntParameter("particles_quantity"); i++)
 	{
 		std::uniform_real_distribution<> random(-5.0, 5.0);
 		std::uniform_real_distribution<> randpos(-0.5, 0.5);
@@ -393,6 +416,7 @@ void GameState::CheckTriggers()
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();
+					camera.StartShaking();
 				}
 
 				if (obj1->GetType() == EntityType::EXPLOSION
@@ -400,6 +424,7 @@ void GameState::CheckTriggers()
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();
+					camera.StartShaking();
 				}
 			}
 		}

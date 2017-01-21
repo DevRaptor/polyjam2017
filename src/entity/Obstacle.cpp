@@ -43,12 +43,17 @@ void Obstacle::Init()
 	{
 		physic_body->body->setCollisionFlags(physic_body->body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
+	else if (type == EntityType::OBSTACLE_HEAVY)
+	{
+		physic_body->body->setLinearFactor(btVector3(0, 0, 0));
+	}
 	else
 	{
 		//2d movement
 		physic_body->body->setLinearFactor(btVector3(1, 0, 1));
 	}
 	
+	physic_body->body->setAngularFactor(btVector3(0, 0, 0));
 	physic_body->body->activate(true);
 	
 	//to avoid render on start in world center
