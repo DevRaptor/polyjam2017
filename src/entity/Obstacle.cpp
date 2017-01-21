@@ -11,7 +11,23 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	else if(type == EntityType::PARTICLE)
 		mesh = GameModule::resources->GetMesh("particle");
 
-		
+	points = 5; //delete it after adding types
+	switch (type) //points range on every
+	{
+	case EntityType::SHIP:
+		break;
+	case EntityType::OBSTACLE:
+		break;
+	case EntityType::PARTICLE:
+		break;
+	case EntityType::BULLET:
+		break;
+	case EntityType::NONE:
+		break;
+	default:
+		break;
+	}
+
 }
 
 void Obstacle::Init()
