@@ -117,7 +117,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			(*it)->Update();
 
-			//dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
 
 			++it;
 		}
@@ -243,10 +243,11 @@ void GameState::RestartGameplay()
 
 void GameState::Explosion(btVector3& pos)
 {
-
-	auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-		glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
-	obj->Init();
-	entities.push_back(obj);
-
+	for (int i = 0; i < 30; i++)
+	{
+		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
+			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+		obj->Init();
+		entities.push_back(obj);
+	}
 }
