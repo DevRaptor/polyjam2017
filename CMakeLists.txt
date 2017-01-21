@@ -79,6 +79,12 @@ find_package(SDL_image REQUIRED)
 include_directories( ${SDL_IMAGE_INCLUDE_DIRS})
 set(LIBRARIES ${LIBRARIES} ${SDL_IMAGE_LIBRARIES})
 
+# Find SDL_mixer
+find_package(SDL_mixer REQUIRED)
+include_directories( ${SDL_MIXER_INCLUDE_DIR})
+set(LIBRARIES ${LIBRARIES} ${SDL_MIXER_LIBRARY})
+
+
 # Find bullet
 find_package(Bullet REQUIRED)
 if( BULLET_FOUND )
