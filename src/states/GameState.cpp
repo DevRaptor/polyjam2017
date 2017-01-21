@@ -8,7 +8,7 @@
 
 #include "modules/GameModule.h"
 
-GameState::GameState()
+GameState::GameState() : camera{90, 0.1, 100}
 {
 	obstacle_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;
 	obstacle_data.pos_z = GameModule::resources->GetFloatParameter("camera_pos_y") / 2.0f;
@@ -43,25 +43,50 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	auto it = players.begin();
-	while (it != players.end())
+	for (std::size_t i = 0; i < players.size(); ++i)
 	{
-		if ((*it)->IsDestroyed())
+		if (i == activeplayerid)
 		{
-			it = players.erase(it);
+			if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+			{
+				players[i]->DoShoot();
+			}
+
+			btVector3* tempvec = new btVector3(0, 0, 0);
+
+			if (GameModule::input->GetKeyState(SDL_SCANCODE_W) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_UP))
+				tempvec->setX(-1);
+			else if (GameModule::input->GetKeyState(SDL_SCANCODE_S) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_DOWN))
+				tempvec->setX(1);
+
+			if (GameModule::input->GetKeyState(SDL_SCANCODE_A) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_LEFT))
+				tempvec->setZ(1);
+			else if (GameModule::input->GetKeyState(SDL_SCANCODE_D) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_RIGHT))
+				tempvec->setZ(-1);
+
+			players[i]->Move(tempvec);
+		}
+
+
+		if (players[i]->IsDestroyed())
+		{
+			players.erase(players.begin() + i);
+			--i;
 		}
 		else
 		{
-			(*it)->Update();
+			players[i]->Update();
 
-			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
-
-			++it;
+			dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
 		}
 	}
 
 
-	it = entities.begin();
+	auto it = entities.begin();
 	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
@@ -87,6 +112,11 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
+
+	if (players.size() > 0)
+	{
+		camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
+	}
 }
 
 void GameState::SpawnObstacles()
@@ -98,12 +128,12 @@ void GameState::SpawnObstacles()
 	z goes wherever you want
 	0,0,0 is player spawn - don't spawn here
 	*/
-	int obstacles_amount_per_wall = 20;
+	int obstacles_amount_per_wall = 15;
 
 	float min_x = -35;
-	float max_x = 0;
+	float max_x = -8;
 	float min_z = -35;
-	float max_z = 0;
+	float max_z = -8;
 
 	float object_size = 3;
 
@@ -115,9 +145,9 @@ void GameState::SpawnObstacles()
 
 	glm::vec3 scale(1, 1, 1);
 
-	for (int i = 0; i < obstacles_amount_per_wall; i++)
+	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
-		for (int j = 0; j < obstacles_amount_per_wall; j++)
+		for (int j = 0; j <= obstacles_amount_per_wall; j++)
 		{
 			if (i == 0 || i == obstacles_amount_per_wall
 				|| j == 0 || j == obstacles_amount_per_wall)
@@ -136,10 +166,13 @@ void GameState::InitGameplay()
 {
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
+	activeplayerid = 0;
+
 	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
 	obj->Init();
 	players.push_back(obj);
-
+	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
+	camera.LookAt(players.front()->GetPosition());
 	SpawnObstacles();
 }
 
