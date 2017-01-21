@@ -17,10 +17,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		mesh = GameModule::resources->GetMesh("teapot");
 	}
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
-	{
-		points = 20;
-		mesh = GameModule::resources->GetMesh("teapot");
-	}
+		mesh = GameModule::resources->GetMesh("obstacle_explosive");
 	else if (type == EntityType::PARTICLE)
 	{
 		points = 0;
