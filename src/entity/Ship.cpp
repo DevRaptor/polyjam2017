@@ -1,12 +1,13 @@
 #include "Ship.h"
 
 #include "Bullet.h"
+#include <math.h>
 
 int Ship::points = 0;
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
-	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container)
+	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container), angle(0)
 {
 	type = EntityType::SHIP;
 	mesh = GameModule::resources->GetMesh("teapot");
@@ -37,6 +38,7 @@ void Ship::Init()
 	//disable rotation
 	physic_body->body->setAngularFactor(btVector3(0, 0, 0));
 
+	Rotate(270.0f);
 }
 
 void Ship::Update()
@@ -81,7 +83,7 @@ void Ship::Update()
 		physic_body->body->setLinearVelocity(velocity);
 	}
 
-
+	
 	//shooting
 	/*
 	if ((std::chrono::high_resolution_clock::now() > shoot_timer)
@@ -91,6 +93,14 @@ void Ship::Update()
 
 		shoot_timer = std::chrono::high_resolution_clock::now() + shoot_delay;
 	}*/
+
+	glm::vec2 mousePosition = GameModule::input->GetMousePos();
+	float newAngle = -atan2(mousePosition[1] - GameModule::resources->GetIntParameter("resolution_y")/2, mousePosition[0] - GameModule::resources->GetIntParameter("resolution_x")/2) - glm::radians(90.0f);
+	if (abs(newAngle - angle) > 0.01)
+	{
+		angle = newAngle;
+		Rotate(angle);
+	}
 }
 
 void Ship::Move(btVector3* direction) //ex (0,0,1) for up
@@ -101,7 +111,7 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 	physic_body->body->getMotionState()->getWorldTransform(transform);
 	btVector3 pos = transform.getOrigin();
 
-	*direction *= move_speed;
+	*direction *= move_speed*5;
 
 	/*
 	if (direction->getZ() > 0 && limit)
@@ -119,7 +129,7 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 
 	physic_body->body->applyCentralImpulse(*direction);
 
-	physic_body->body->setDamping(move_damping, 0);
+	physic_body->body->setDamping(0.9999, 0);
 }
 
 void Ship::DoShoot()

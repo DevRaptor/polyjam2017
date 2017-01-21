@@ -31,6 +31,17 @@ public:
 
 	virtual void DoShoot() {}
 	virtual void Move(btVector3* direction) {}
+	void Rotate(double angleInDegrees)
+	{
+		btQuaternion qNewOrientation;
+		//qNewOrientation.setEuler(angleInDegrees, 0, 0);
+		//qNewOrientation.setEuler(glm::radians(angleInDegrees), 0, 0);
+		qNewOrientation.setRotation(btVector3(0,1,0), angleInDegrees);
+		btTransform transBody;
+		physic_body->body->getMotionState()->getWorldTransform(transBody);
+		transBody.setRotation(qNewOrientation);
+		physic_body->body->setCenterOfMassTransform(transBody);
+	}
 
 	void Draw()
 	{
