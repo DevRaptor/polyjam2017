@@ -24,7 +24,7 @@ public:
 	void Update(std::chrono::milliseconds delta_time);
 
 private:
-
+	std::vector<std::shared_ptr<Entity>> players;
 	std::vector<std::shared_ptr<Entity>> entities;
 
 	//physics

@@ -89,6 +89,12 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 	shader_program->UseProgram();
 
 	glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
+	for (auto ptr : game_state->players)
+	{
+		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(ptr->transform_mat));
+		ptr->Draw();
+	}
+
 	for (auto ptr : game_state->entities)
 	{
 		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(ptr->transform_mat));
