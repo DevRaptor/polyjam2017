@@ -65,6 +65,14 @@ public:
 		return glm::vec3(transform.getOrigin().getX(), transform.getOrigin().getY(), transform.getOrigin().getZ());
 	}
 
+	btVector3 GetPhysicPosition()
+	{
+		btTransform transform;
+		physic_body->body->getMotionState()->getWorldTransform(transform);
+		//float pos_x = transform.getOrigin().getX();
+		return transform.getOrigin();
+	}
+
 protected:
 	EntityType type;
 

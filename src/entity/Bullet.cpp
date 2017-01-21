@@ -5,7 +5,7 @@ Bullet::Bullet(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
 	: Entity(world_ptr, start_pos, scale), velocity(initVelocity)
 {
 	type = EntityType::BULLET;
-	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
+	mesh = GameModule::resources->GetMesh("teapot");
 }
 
 void Bullet::Init()

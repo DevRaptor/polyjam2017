@@ -73,4 +73,6 @@ private:
 
 	void InitGameplay();
 	void RestartGameplay();
+
+	void Explosion(btVector3& pos);
 };

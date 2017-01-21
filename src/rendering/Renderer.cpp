@@ -57,23 +57,6 @@ Renderer::Renderer(int resolution_x, int resolution_y)
 
 	mvp_uniform = glGetUniformLocation(shader_program->GetProgram(), "mvp");
 	transform_uniform = glGetUniformLocation(shader_program->GetProgram(), "transform");
-
-	float ratio = static_cast<float>(resolution_x) / static_cast<float>(resolution_y);
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), ratio, 0.1f, 100.0f);
-
-	glm::vec3 camera_pos(
-		GameModule::resources->GetFloatParameter("camera_pos_x"),
-		GameModule::resources->GetFloatParameter("camera_pos_y"),
-		GameModule::resources->GetFloatParameter("camera_pos_z"));
-
-	glm::mat4 view = glm::lookAt(
-		camera_pos,
-		glm::vec3(-12, 0, 0),
-		glm::vec3(0, 1, 0));
-
-	glm::mat4 model = glm::mat4(1.0f);
-
-	mvp = projection * view * model;
 }
 
 Renderer::~Renderer()
