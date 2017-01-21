@@ -222,10 +222,10 @@ void GameState::SpawnObstacles()
 
 	float object_size = 3;
 
-	int no_spawn_chance = 20;
-	int light_spawn_chance = 10;
-	int heavy_spawn_chance = 10;
-	int expl_spawn_chance = 10;
+	int no_spawn_chance = GameModule::resources->GetIntParameter("no_spawn_chance");
+	int light_spawn_chance = GameModule::resources->GetIntParameter("light_spawn_chance");
+	int heavy_spawn_chance = GameModule::resources->GetIntParameter("heavy_spawn_chance");
+	int expl_spawn_chance = GameModule::resources->GetIntParameter("expl_spawn_chance");
 
 	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
 
