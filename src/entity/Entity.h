@@ -48,6 +48,13 @@ public:
 	bool IsDestroyed() { return destroyed; }
 
 	RigidBody* GetRigidBody() { return physic_body->body.get(); }
+	glm::vec3 GetPosition() 
+	{
+		btTransform transform;
+		physic_body->body->getMotionState()->getWorldTransform(transform);
+		//float pos_x = transform.getOrigin().getX();
+		return glm::vec3(transform.getOrigin().getX(), transform.getOrigin().getY(), transform.getOrigin().getZ());
+	}
 
 protected:
 	EntityType type;

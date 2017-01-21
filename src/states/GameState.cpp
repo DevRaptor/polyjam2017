@@ -9,6 +9,7 @@
 #include "modules/GameModule.h"
 
 GameState::GameState()
+	: camera{90, 0.1, 100}
 {
 	obstacle_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;
 	obstacle_data.pos_z = GameModule::resources->GetFloatParameter("camera_pos_y") / 2.0f;
@@ -125,6 +126,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
+
+	/*if (players.size() > 0)
+	{
+		camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
+		camera.LookAt(players.front()->GetPosition());
+	}*/
 }
 
 void GameState::SpawnObstacle()
@@ -159,6 +166,8 @@ void GameState::AddPlayer()
 	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
 	obj->Init();
 	players.push_back(obj);
+	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
+	camera.LookAt(players.front()->GetPosition());
 }
 
 void GameState::RestartGameplay()
