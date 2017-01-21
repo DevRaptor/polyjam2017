@@ -250,16 +250,17 @@ void GameState::RestartGameplay()
 void GameState::Explosion(btVector3& pos)
 {
 
-	auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-		glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+	for (int i = 0; i < 3; i++)
+	{
+		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
+			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+		obj->Init();
+		entities.push_back(obj);
+	}
+
+	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(3, 3, 3));
 	obj->Init();
 	entities.push_back(obj);
-
-	obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(3, 3, 3));
-	obj->Init();
-	entities.push_back(obj);
-
-
 }
 
 void GameState::CheckTriggers()
