@@ -10,7 +10,7 @@ Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_p
 	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container), angle(0), isEnabled{ false }
 {
 	type = EntityType::SHIP;
-	mesh = GameModule::resources->GetMesh("teapot");
+	mesh = GameModule::resources->GetMesh("player1");
 
 	points = 0;
 
@@ -37,8 +37,6 @@ void Ship::Init()
 
 	//disable rotation
 	physic_body->body->setAngularFactor(btVector3(0, 0, 0));
-
-	Rotate(270.0f);
 }
 
 void Ship::Update()
