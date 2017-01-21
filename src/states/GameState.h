@@ -36,6 +36,10 @@ private:
 
 	CustomCallback callback;
 
+	int activeplayerid;
+	//playersamount is ship::indexer;
+
+	void AddPlayer();
 
 	struct
 	{

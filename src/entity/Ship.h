@@ -9,12 +9,16 @@ class Ship : public Entity, public std::enable_shared_from_this<Ship>
 {
 public:
 	static int points; //reset in constructor
+	static int indexer;
 
 	Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 		std::vector<std::shared_ptr<Entity>>& bullet_container);
 
 	void Init() override;
 	void Update() override;
+
+	void DoShoot() override;
+	void Move(btVector3* direction) override;
 
 protected:
 	float move_speed;

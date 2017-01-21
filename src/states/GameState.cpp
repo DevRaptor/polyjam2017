@@ -46,6 +46,33 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	auto it = players.begin();
 	while (it != players.end())
 	{
+		if ((*it)->index == activeplayerid)
+		{
+			if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+			{
+				(*it)->DoShoot();
+			}
+
+			btVector3* tempvec = new btVector3(0, 0, 0);
+
+			if (GameModule::input->GetKeyState(SDL_SCANCODE_W) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_UP))
+				tempvec->setX(-1);
+			else if (GameModule::input->GetKeyState(SDL_SCANCODE_S) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_DOWN))
+				tempvec->setX(1);
+
+			if (GameModule::input->GetKeyState(SDL_SCANCODE_A) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_LEFT))
+				tempvec->setZ(1);
+			else if (GameModule::input->GetKeyState(SDL_SCANCODE_D) ||
+				GameModule::input->GetKeyState(SDL_SCANCODE_RIGHT))
+				tempvec->setZ(-1);
+
+			(*it)->Move(tempvec);
+		}
+
+
 		if ((*it)->IsDestroyed())
 		{
 			it = players.erase(it);
@@ -122,6 +149,13 @@ void GameState::InitGameplay()
 {
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
+	AddPlayer();
+
+	activeplayerid = 0;
+}
+
+void GameState::AddPlayer()
+{
 	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
 	obj->Init();
 	players.push_back(obj);
