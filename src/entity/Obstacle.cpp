@@ -6,7 +6,11 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	
 	type = obj_type;
 
-	if(type == EntityType::OBSTACLE)
+	if(type == EntityType::OBSTACLE_HEAVY)
+		mesh = GameModule::resources->GetMesh("teapot");
+	else if (type == EntityType::OBSTACLE_LIGHT)
+		mesh = GameModule::resources->GetMesh("teapot");
+	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
 		mesh = GameModule::resources->GetMesh("teapot");
 	else if(type == EntityType::PARTICLE)
 		mesh = GameModule::resources->GetMesh("particle");
@@ -18,14 +22,15 @@ void Obstacle::Init()
 {
 	physic_body = std::make_unique<PhysicBody>(world.lock(), pos, scale, type, shared_from_this());
 	
-	if (type == EntityType::OBSTACLE)
+	
+	if (type == EntityType::PARTICLE)
+	{
+
+	}
+	else
 	{
 		//2d movement
 		physic_body->body->setLinearFactor(btVector3(1, 0, 1));
-	}
-	else if (type == EntityType::PARTICLE)
-	{
-
 	}
 	
 	physic_body->body->activate(true);
