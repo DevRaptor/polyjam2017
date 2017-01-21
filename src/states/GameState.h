@@ -42,6 +42,16 @@ private:
 	int activeplayerid;
 	//playersamount is ship::indexer;
 
+	glm::mat4 floor_transform;
+	std::shared_ptr<Mesh> floor_mesh;
+	std::shared_ptr<PhysicBody> floor_physic_body;
+
+	std::shared_ptr<btCollisionShape> groundShape;
+	std::shared_ptr<btDefaultMotionState> groundMotionState;
+	std::shared_ptr<btRigidBody> groundRigidBody;
+
+	void AddFloor();
+
 	void AddPlayer(glm::vec3 startpos);
 
 	struct

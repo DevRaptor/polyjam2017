@@ -28,7 +28,9 @@ GameState::GameState() : camera{90, 0.1, 100}
 	dynamic_world = std::make_shared<btDiscreteDynamicsWorld>(dispatcher.get(), broad_phase.get(),
 		solver.get(), collision_config.get());
 
-	dynamic_world->setGravity(btVector3(0, 0, 0));
+	dynamic_world->setGravity(btVector3(0, -10, 0));
+	
+	AddFloor();
 
 	InitGameplay();
 }
@@ -186,6 +188,28 @@ void GameState::InitGameplay()
 	activeplayerid = 0;
 
 	SpawnObstacles();
+}
+
+void GameState::AddFloor()
+{
+
+	groundShape = std::make_shared<btStaticPlaneShape>(btVector3(0, 1, 0), -5);
+
+	groundMotionState = std::make_shared<btDefaultMotionState>(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
+	btRigidBody::btRigidBodyConstructionInfo
+		groundRigidBodyCI(0, groundMotionState.get(), groundShape.get(), btVector3(0, 0, 0));
+	groundRigidBody = std::make_shared<btRigidBody>(groundRigidBodyCI);
+	dynamic_world->addRigidBody(groundRigidBody.get());
+
+	btTransform transform;
+	groundRigidBody->getMotionState()->getWorldTransform(transform);
+	float matrix[16];
+	transform.getOpenGLMatrix(matrix);
+
+	floor_transform = glm::make_mat4(matrix);// *glm::scale(glm::mat4(1.0f), scale);
+
+	floor_mesh = GameModule::resources->GetMesh("data/models/floor.obj");
+
 }
 
 void GameState::AddPlayer(glm::vec3 startpos)

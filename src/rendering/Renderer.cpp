@@ -90,6 +90,14 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 
 	mvp = game_state->camera.GetMVP();
 	glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
+
+	if (game_state->floor_mesh)
+	{
+		//glm::mat4 mat(1.0f);
+		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(game_state->floor_transform));
+		game_state->floor_mesh->Draw();
+	}
+
 	for (auto ptr : game_state->players)
 	{
 		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(ptr->transform_mat));
