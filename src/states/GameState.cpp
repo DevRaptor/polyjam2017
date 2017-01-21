@@ -117,7 +117,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			(*it)->Update();
 
-			//dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
 
 			++it;
 		}
@@ -255,6 +255,11 @@ void GameState::Explosion(btVector3& pos)
 	obj->Init();
 	entities.push_back(obj);
 
+	obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(3, 3, 3));
+	obj->Init();
+	entities.push_back(obj);
+
+
 }
 
 void GameState::CheckTriggers()
@@ -279,7 +284,19 @@ void GameState::CheckTriggers()
 				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
 				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
 
-				if (obj0->GetType() == EntityType::BULLET || obj1->GetType() == EntityType::BULLET)
+				/*if (obj0->GetType() == EntityType::BULLET || obj1->GetType() == EntityType::BULLET)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}*/
+
+				if (obj0->GetType() == EntityType::EXPLOSION && obj1->GetType() == EntityType::OBSTACLE_HEAVY)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}
+
+				if (obj1->GetType() == EntityType::EXPLOSION && obj0->GetType() == EntityType::OBSTACLE_HEAVY)
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();

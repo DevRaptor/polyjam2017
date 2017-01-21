@@ -12,9 +12,10 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		mesh = GameModule::resources->GetMesh("teapot");
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
 		mesh = GameModule::resources->GetMesh("teapot");
-	else if(type == EntityType::PARTICLE)
+	else if (type == EntityType::PARTICLE)
 		mesh = GameModule::resources->GetMesh("particle");
-
+	else if (type == EntityType::EXPLOSION)
+		mesh = GameModule::resources->GetMesh("sphere");
 		
 }
 
@@ -26,6 +27,10 @@ void Obstacle::Init()
 	if (type == EntityType::PARTICLE)
 	{
 
+	}
+	else if (type == EntityType::EXPLOSION)
+	{
+		physic_body->body->setCollisionFlags(physic_body->body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 	else
 	{

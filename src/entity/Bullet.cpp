@@ -19,7 +19,7 @@ void Bullet::Init()
 	btVector3 velocity(move_speed*velocity[1], 0.0f, move_speed*velocity[0]);
 	physic_body->body->setLinearVelocity(velocity);
 
-	physic_body->body->setCollisionFlags(physic_body->body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	//physic_body->body->setCollisionFlags(physic_body->body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 
 	//to avoid render on start in world center
 	transform_mat = physic_body->GetTransformMatrix();
