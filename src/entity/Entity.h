@@ -35,7 +35,8 @@ public:
 	{
 		btQuaternion qNewOrientation;
 		//qNewOrientation.setEuler(angleInDegrees, 0, 0);
-		qNewOrientation.setEuler(glm::radians(angleInDegrees), 0, 0);
+		//qNewOrientation.setEuler(glm::radians(angleInDegrees), 0, 0);
+		qNewOrientation.setRotation(btVector3(0,1,0), angleInDegrees);
 		btTransform transBody;
 		physic_body->body->getMotionState()->getWorldTransform(transBody);
 		transBody.setRotation(qNewOrientation);

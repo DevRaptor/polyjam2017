@@ -1,12 +1,13 @@
 #include "Ship.h"
 
 #include "Bullet.h"
+#include <math.h>
 
 int Ship::points = 0;
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
-	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container)
+	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container), angle(0)
 {
 	type = EntityType::SHIP;
 	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
@@ -92,6 +93,14 @@ void Ship::Update()
 
 		shoot_timer = std::chrono::high_resolution_clock::now() + shoot_delay;
 	}*/
+
+	glm::vec2 mousePosition = GameModule::input->GetMousePos();
+	float newAngle = -atan2(mousePosition[1] - GameModule::resources->GetIntParameter("resolution_y")/2, mousePosition[0] - GameModule::resources->GetIntParameter("resolution_x")/2) - glm::radians(90.0f);
+	if (abs(newAngle - angle) > 0.01)
+	{
+		angle = newAngle;
+		Rotate(angle);
+	}
 }
 
 void Ship::Move(btVector3* direction) //ex (0,0,1) for up

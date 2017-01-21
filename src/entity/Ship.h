@@ -28,6 +28,8 @@ protected:
 
 	float movement_limit;
 
+	float angle;
+
 	std::chrono::milliseconds shoot_delay; //time to next shoot
 	std::chrono::high_resolution_clock::time_point shoot_timer;
 
