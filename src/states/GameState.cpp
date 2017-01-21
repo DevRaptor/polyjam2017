@@ -72,6 +72,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		if (i == activeplayerid)
 		{
+			if (!players[i]->GetIsEnabled())
+			{
+				players[i]->SetIsEnabled(true);
+				NextPlayer();
+			}
+
 			if (!blockinput)
 			{
 				if (GameModule::input->IsLeftMouseButtonPressed() && !blockshooting)
@@ -97,7 +103,6 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 				players[i]->Move(tempvec);
 			}
-			
 		}
 
 

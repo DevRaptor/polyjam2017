@@ -27,7 +27,7 @@ public:
 	std::chrono::high_resolution_clock::time_point playertimer;
 
 private:
-	std::vector<std::shared_ptr<Entity>> players;
+	std::vector<std::shared_ptr<Ship>> players;
 	std::vector<std::shared_ptr<Entity>> entities;
 
 	bool blockinput = false;
