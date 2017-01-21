@@ -31,4 +31,6 @@ protected:
 	glm::mat4 mvp;
 	GLuint transform_uniform;
 	GLuint mvp_uniform;
+	GLuint fadeout_uniform;
+	GLfloat fadeout;
 };

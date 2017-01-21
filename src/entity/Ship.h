@@ -16,11 +16,14 @@ public:
 
 	void DoShoot() override;
 	void Move(btVector3* direction) override;
+	
 
 	bool shot = false;
 	bool AlreadyShot() override;
 	void QuitShooting() override;
 
+	void SetIsEnabled(bool isTrue) { isEnabled = isTrue; }
+	bool GetIsEnabled() { return isEnabled; }
 protected:
 	float move_speed;
 	float move_speed_max;
@@ -31,6 +34,7 @@ protected:
 	float movement_limit;
 
 	float angle;
+	bool isEnabled;
 
 	std::chrono::milliseconds shoot_delay; //time to next shoot
 	std::chrono::high_resolution_clock::time_point shoot_timer;

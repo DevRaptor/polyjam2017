@@ -46,7 +46,7 @@ Renderer::Renderer(int resolution_x, int resolution_y)
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glClearColor(0, 0, 0.5f, 0);
+	glClearColor(0, 0, 0, 0);
 	glViewport(0, 0, resolution_x, resolution_y);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(window);
@@ -57,6 +57,7 @@ Renderer::Renderer(int resolution_x, int resolution_y)
 
 	mvp_uniform = glGetUniformLocation(shader_program->GetProgram(), "mvp");
 	transform_uniform = glGetUniformLocation(shader_program->GetProgram(), "transform");
+	fadeout_uniform = glGetUniformLocation(shader_program->GetProgram(), "fadeout");
 }
 
 Renderer::~Renderer()
@@ -73,6 +74,9 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 
 	mvp = game_state->camera.GetMVP();
 	glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
+
+	fadeout = game_state->get_fadeout();
+	glUniform1f(fadeout_uniform, fadeout);
 
 	if (game_state->floor_mesh)
 	{

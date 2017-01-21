@@ -9,7 +9,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	if (type == EntityType::OBSTACLE_HEAVY)
 	{
 		points = 50;
-		mesh = GameModule::resources->GetMesh("teapot");
+		mesh = GameModule::resources->GetMesh("obstacle_heavy");
 	}
 	else if (type == EntityType::OBSTACLE_LIGHT)
 	{

@@ -24,6 +24,19 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 			return 0;
 		}
 
+		if (own_obj0->GetType() == EntityType::SHIP && own_obj1->GetType() == EntityType::BULLET)
+		{
+			static_cast<Ship*>(own_obj0->GetOwner().get())->SetIsEnabled(false);
+			own_obj1->GetOwner()->Destroy();
+			return 0;
+		}
+		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::BULLET)
+		{
+			static_cast<Ship*>(own_obj1->GetOwner().get())->SetIsEnabled(false);
+			own_obj0->GetOwner()->Destroy();
+			return 0;
+		}
+
 		own_obj0->GetOwner()->Destroy();
 		own_obj1->GetOwner()->Destroy();
 

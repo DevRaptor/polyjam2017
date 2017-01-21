@@ -27,12 +27,14 @@ public:
 	std::chrono::high_resolution_clock::time_point playertimer;
 
 private:
-	std::vector<std::shared_ptr<Entity>> players;
+	std::vector<std::shared_ptr<Ship>> players;
 	std::vector<std::shared_ptr<Entity>> entities;
 
 	bool blockinput = false;
 	bool blockshooting = false;
 	bool fade = false;
+	float fadeout_coef = 1.0f; //coefficient of screen fadeout where 1 is clear, 0 is fully faded
+	float fadeout_speed = 0.5f;
 
 	void NextPlayer();
 	bool DestructionsEnded();
@@ -60,6 +62,7 @@ private:
 	glm::mat4 floor_transform;
 	std::shared_ptr<Mesh> floor_mesh;
 	std::shared_ptr<PhysicBody> floor_physic_body;
+	GLfloat get_fadeout();
 
 	std::shared_ptr<btCollisionShape> groundShape;
 	std::shared_ptr<btDefaultMotionState> groundMotionState;
