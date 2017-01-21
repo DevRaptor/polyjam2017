@@ -111,7 +111,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			(*it)->Update();
 
-			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+			//dynamic_world->contactTest((*it)->GetRigidBody(), callback);
 
 			++it;
 		}
@@ -193,7 +193,7 @@ void GameState::InitGameplay()
 void GameState::AddFloor()
 {
 
-	groundShape = std::make_shared<btStaticPlaneShape>(btVector3(0, 1, 0), -5);
+	groundShape = std::make_shared<btStaticPlaneShape>(btVector3(0, 1, 0), 0);
 
 	groundMotionState = std::make_shared<btDefaultMotionState>(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
 	btRigidBody::btRigidBodyConstructionInfo

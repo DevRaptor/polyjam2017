@@ -12,7 +12,7 @@ void Obstacle::Init()
 	physic_body = std::make_unique<PhysicBody>(world.lock(), pos, scale, type, shared_from_this());
 
 	//2d movement
-	physic_body->body->setLinearFactor(btVector3(1, 0, 1));
+	physic_body->body->setLinearFactor(btVector3(1, 1, 1));
 
 	physic_body->body->activate(true);
 
@@ -22,5 +22,5 @@ void Obstacle::Init()
 
 void Obstacle::Update()
 {
-
+	transform_mat = physic_body->GetTransformMatrix();
 }
