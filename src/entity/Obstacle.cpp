@@ -1,13 +1,13 @@
-#include "Meteor.h"
+#include "Obstacle.h"
 
-Meteor::Meteor(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale)
+Obstacle::Obstacle(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale)
 	: Entity(world_ptr, start_pos, scale)
 {
-	type = EntityType::METEOR;
+	type = EntityType::OBSTACLE;
 	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
 }
 
-void Meteor::Init()
+void Obstacle::Init()
 {
 	physic_body = std::make_unique<PhysicBody>(world.lock(), pos, scale, type, shared_from_this());
 
@@ -41,7 +41,7 @@ void Meteor::Init()
 	transform_mat = physic_body->GetTransformMatrix();
 }
 
-void Meteor::Update()
+void Obstacle::Update()
 {
 	transform_mat = physic_body->GetTransformMatrix();
 

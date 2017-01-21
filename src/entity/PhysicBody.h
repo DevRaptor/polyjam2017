@@ -9,7 +9,7 @@
 enum class EntityType
 {
 	SHIP,
-	METEOR,
+	OBSTACLE,
 	BULLET,
 	NONE
 };

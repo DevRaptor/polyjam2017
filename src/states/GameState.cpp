@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "entity/Meteor.h"
+#include "entity/Obstacle.h"
 #include "entity/Ship.h"
 #include "utility/Log.h"
 
@@ -11,15 +11,15 @@
 GameState::GameState()
 	: camera{90, 0.1, 100}
 {
-	meteor_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;
-	meteor_data.pos_z = GameModule::resources->GetFloatParameter("camera_pos_y") / 2.0f;
+	obstacle_data.pos_x = -GameModule::resources->GetFloatParameter("camera_pos_y") * 1.2f;
+	obstacle_data.pos_z = GameModule::resources->GetFloatParameter("camera_pos_y") / 2.0f;
 
-	meteor_data.scale_min = GameModule::resources->GetFloatParameter("meteor_scale_min");
-	meteor_data.scale_max = GameModule::resources->GetFloatParameter("meteor_scale_max");
-	meteor_data.distortion = GameModule::resources->GetFloatParameter("meteor_max_distortion");
+	obstacle_data.scale_min = GameModule::resources->GetFloatParameter("meteor_scale_min");
+	obstacle_data.scale_max = GameModule::resources->GetFloatParameter("meteor_scale_max");
+	obstacle_data.distortion = GameModule::resources->GetFloatParameter("meteor_max_distortion");
 
-	meteor_data.default_delay = GameModule::resources->GetIntParameter("meteor_delay");
-	meteor_data.min_delay = GameModule::resources->GetIntParameter("meteor_delay_min");
+	obstacle_data.default_delay = GameModule::resources->GetIntParameter("meteor_delay");
+	obstacle_data.min_delay = GameModule::resources->GetIntParameter("meteor_delay_min");
 
 	broad_phase = std::make_unique<btDbvtBroadphase>();
 	collision_config = std::make_unique<btDefaultCollisionConfiguration>();
@@ -80,15 +80,15 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	}
 
 
-	if (std::chrono::high_resolution_clock::now() > meteor_data.timer)
+	if (std::chrono::high_resolution_clock::now() > obstacle_data.timer)
 	{
-		SpawnMeteor();
-		meteor_data.timer = std::chrono::high_resolution_clock::now() + meteor_data.delay;
+		SpawnObstacle();
+		obstacle_data.timer = std::chrono::high_resolution_clock::now() + obstacle_data.delay;
 	}
 
-	//change meteor delay time when player destroyed meteors
-	int delay = meteor_data.default_delay - (100 * Ship::points);
-	meteor_data.delay = std::chrono::milliseconds(delay > meteor_data.min_delay ? delay : meteor_data.min_delay);
+	//change Obstacle delay time when player destroyed Obstacles
+	int delay = obstacle_data.default_delay - (100 * Ship::points);
+	obstacle_data.delay = std::chrono::milliseconds(delay > obstacle_data.min_delay ? delay : obstacle_data.min_delay);
 
 
 	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
@@ -107,27 +107,27 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	}*/
 }
 
-void GameState::SpawnMeteor()
+void GameState::SpawnObstacle()
 {
-	std::uniform_real_distribution<> random_distortion(1.0f, meteor_data.distortion);
-	std::uniform_real_distribution<> random_scale(meteor_data.scale_min, meteor_data.scale_max);
+	std::uniform_real_distribution<> random_distortion(1.0f, obstacle_data.distortion);
+	std::uniform_real_distribution<> random_scale(obstacle_data.scale_min, obstacle_data.scale_max);
 	float size = random_scale(GameModule::random_gen);
 
 	glm::vec3 scale(size, size, size * random_distortion(GameModule::random_gen));
 
-	std::uniform_real_distribution<> rand_pos_z(-meteor_data.pos_z, meteor_data.pos_z);
+	std::uniform_real_distribution<> rand_pos_z(-obstacle_data.pos_z, obstacle_data.pos_z);
 
-	//must lower meteor position by half of size
-	glm::vec3 pos(meteor_data.pos_x, -size / 2.0f, rand_pos_z(GameModule::random_gen));
+	//must lower Obstacle position by half of size
+	glm::vec3 pos(obstacle_data.pos_x, -size / 2.0f, rand_pos_z(GameModule::random_gen));
 
-	auto meteor = std::make_shared<Meteor>(dynamic_world, pos, scale);
-	meteor->Init();
-	entities.push_back(meteor);
+	auto obj = std::make_shared<Obstacle>(dynamic_world, pos, scale);
+	obj->Init();
+	entities.push_back(obj);
 }
 
 void GameState::InitGameplay()
 {
-	meteor_data.delay = std::chrono::milliseconds(meteor_data.default_delay);
+	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
 	obj->Init();
