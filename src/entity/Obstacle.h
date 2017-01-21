@@ -2,10 +2,10 @@
 
 #include "entity/Entity.h"
 
-class Meteor : public Entity, public std::enable_shared_from_this<Meteor>
+class Obstacle : public Entity, public std::enable_shared_from_this<Obstacle>
 {
 public:
-	Meteor(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
+	Obstacle(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
 		glm::vec3 start_pos, glm::vec3 scale);
 
 	void Init() override;

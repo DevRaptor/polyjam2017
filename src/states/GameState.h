@@ -50,9 +50,9 @@ private:
 		int default_delay; //in ms
 		std::chrono::milliseconds delay; //time to next shoot
 		std::chrono::high_resolution_clock::time_point timer;
-	} meteor_data;
+	} obstacle_data;
 
-	void SpawnMeteor();
+	void SpawnObstacle();
 
 	void InitGameplay();
 	void RestartGameplay();
