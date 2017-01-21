@@ -70,6 +70,7 @@ private:
 	} obstacle_data;
 
 	void SpawnObstacles();
+	void CheckTriggers();
 
 	void InitGameplay();
 	void RestartGameplay();

@@ -24,10 +24,14 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 			return 0;
 		}
 
-		if (own_obj0->GetType()  == EntityType::BULLET)
+		if (own_obj0->GetType() == EntityType::BULLET)
+		{
 			Ship::points++;
-		else if(own_obj1->GetType() == EntityType::BULLET)
+		}
+		else if (own_obj1->GetType() == EntityType::BULLET)
+		{
 			Ship::points++;
+		}
 
 		own_obj0->GetOwner()->Destroy();
 		own_obj1->GetOwner()->Destroy();

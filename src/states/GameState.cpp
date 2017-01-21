@@ -143,7 +143,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		//camera.LookAt(players.front()->GetPosition());
 	}
+
+
+
+
+	CheckTriggers();
+	
 }
+
 
 void GameState::SpawnObstacles()
 {
@@ -157,22 +164,11 @@ void GameState::SpawnObstacles()
 	int obstacles_amount_per_wall = 30;
 
 	// How far from each side from any player obstacles can't spawn
-	float player_safe_space_size = 5; 
+	float player_safe_space_size = 5;
 
 
 	float object_size = 3;
-	/*
-	float min_x = -50;
-	float max_x = -10;
-	float min_z = -50;
-	float max_z = -10;
-
-	std::uniform_real_distribution<> random_spawn_start_x(min_x, max_x);
-	std::uniform_real_distribution<> random_spawn_start_z(min_z, max_z);
-
-	float start_x = random_spawn_start_x(GameModule::random_gen);
-	float start_z = random_spawn_start_z(GameModule::random_gen);
-	*/
+	
 	int no_spawn_chance = 20;
 	int light_spawn_chance = 10;
 	int heavy_spawn_chance = 10;
@@ -194,7 +190,7 @@ void GameState::SpawnObstacles()
 			for (std::size_t i = 0; i < players.size(); ++i)
 			{
 				glm::vec3 player_pos = players[i]->GetPosition();
-				if ( ! (((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
+				if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
 					|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
 				{
 					is_position_near_player = true;
@@ -205,9 +201,9 @@ void GameState::SpawnObstacles()
 			if (!is_position_near_player)
 			{
 				glm::vec3 pos(current_x, 0, current_z);
-				
+
 				int rand_obstacle_type = random_spawner(GameModule::random_gen);
-				
+
 				if (rand_obstacle_type < expl_spawn_chance)
 				{
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale);
@@ -233,8 +229,10 @@ void GameState::SpawnObstacles()
 	}
 }
 
+
 void GameState::InitGameplay()
 {
+	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	for (int i = 0; i < 5; i++) //raptor said 4
 	{
@@ -288,9 +286,60 @@ void GameState::RestartGameplay()
 void GameState::Explosion(btVector3& pos)
 {
 
-	auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-		glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+	for (int i = 0; i < 3; i++)
+	{
+		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
+			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+		obj->Init();
+		entities.push_back(obj);
+	}
+
+	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(3, 3, 3));
 	obj->Init();
 	entities.push_back(obj);
-
 }
+
+void GameState::CheckTriggers()
+{
+	int numManifolds = dynamic_world->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = dynamic_world->getDispatcher()->getManifoldByIndexInternal(i);
+		auto  obA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
+		auto  obB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
+
+		int numContacts = contactManifold->getNumContacts();
+		for (int j = 0; j < numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance() < 0.f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
+
+				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
+				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
+
+				/*if (obj0->GetType() == EntityType::BULLET || obj1->GetType() == EntityType::BULLET)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}*/
+
+				if (obj0->GetType() == EntityType::EXPLOSION && obj1->GetType() == EntityType::OBSTACLE_HEAVY)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}
+
+				if (obj1->GetType() == EntityType::EXPLOSION && obj0->GetType() == EntityType::OBSTACLE_HEAVY)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}
+			}
+		}
+	}
+}
+

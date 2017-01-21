@@ -14,6 +14,7 @@ enum class EntityType
 	OBSTACLE_EXPLOSIVE,
 	PARTICLE, //obstacle class
 	BULLET,
+	EXPLOSION,
 	NONE
 };
 
