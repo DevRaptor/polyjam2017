@@ -45,21 +45,26 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	//TURNSYSTEM
+	//TURNSYSTEM - stateslike
 	
 	if ((std::chrono::high_resolution_clock::now() > playertimer) || players[activeplayerid]->AlreadyShot())
 	{
-		if (!blockinput)
+		if (!blockshooting)
 		{
-			blockinput = true;
+			blockshooting = true;
 			ResetDestructTimer();
 		}
 		//camera change to show destructions
 	}
 
-	if (blockinput && DestructionsEnded())
+	if (blockshooting && DestructionsEnded())
+	{		
+		FadeInEffect();
+	}
+
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
 	{
-		//fade in effect
+		fade = false;
 		NextPlayer();
 	}
 
@@ -67,9 +72,9 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		if (i == activeplayerid)
 		{
-			if (!blockinput) 
+			if (!blockinput)
 			{
-				if (GameModule::input->IsLeftMouseButtonPressed())
+				if (GameModule::input->IsLeftMouseButtonPressed() && !blockshooting)
 				{
 					players[i]->DoShoot();
 				}
@@ -92,6 +97,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 				players[i]->Move(tempvec);
 			}
+			
 		}
 
 
@@ -171,8 +177,15 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	CheckTriggers();
 }
 
+void GameState::FadeInEffect()
+{
+	blockinput = true;
+	fade = true;
+}
+
 void GameState::NextPlayer()
 {
+
 	if(activeplayerid != -1) //first iteration AccessViolation exception
 		players[activeplayerid]->QuitShooting();
 
@@ -183,6 +196,7 @@ void GameState::NextPlayer()
 
 	ResetTurnTimer();
 
+	blockshooting = false;
 	blockinput = false;
 }
 

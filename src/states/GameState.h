@@ -31,8 +31,12 @@ private:
 	std::vector<std::shared_ptr<Entity>> entities;
 
 	bool blockinput = false;
+	bool blockshooting = false;
+	bool fade = false;
+
 	void NextPlayer();
 	bool DestructionsEnded();
+	void FadeInEffect();
 
 	void ResetTurnTimer();
 
