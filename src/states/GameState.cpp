@@ -68,6 +68,15 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		NextPlayer();
 	}
 
+	if (fade && fadeout_coef > 0.0f)
+	{
+		fadeout_coef -= 0.5f * delta;
+	}
+	else if (fadeout_coef < 1.0f)
+	{
+		fadeout_coef += 0.5f * delta;
+	}
+
 	for (std::size_t i = 0; i < players.size(); ++i)
 	{
 		if (i == activeplayerid)
@@ -190,6 +199,7 @@ void GameState::FadeInEffect()
 	blockinput = true;
 	fade = true;
 }
+
 
 void GameState::NextPlayer()
 {
@@ -326,6 +336,11 @@ void GameState::InitGameplay()
 }
 
 
+
+GLfloat GameState::get_fadeout()
+{
+	return fadeout_coef;
+}
 
 void GameState::AddFloor()
 {

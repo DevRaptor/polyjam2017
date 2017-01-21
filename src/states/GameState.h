@@ -33,6 +33,7 @@ private:
 	bool blockinput = false;
 	bool blockshooting = false;
 	bool fade = false;
+	float fadeout_coef = 1.0f; //coefficient of screen fadeout where 1 is clear, 0 is fully faded
 
 	void NextPlayer();
 	bool DestructionsEnded();
@@ -60,6 +61,7 @@ private:
 	glm::mat4 floor_transform;
 	std::shared_ptr<Mesh> floor_mesh;
 	std::shared_ptr<PhysicBody> floor_physic_body;
+	GLfloat get_fadeout();
 
 	std::shared_ptr<btCollisionShape> groundShape;
 	std::shared_ptr<btDefaultMotionState> groundMotionState;
