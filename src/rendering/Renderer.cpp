@@ -88,6 +88,7 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 
 	shader_program->UseProgram();
 
+	mvp = game_state->camera.GetMVP();
 	glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
 	for (auto ptr : game_state->players)
 	{

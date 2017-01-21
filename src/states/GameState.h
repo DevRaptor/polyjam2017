@@ -10,6 +10,7 @@
 
 #include "CustomCallback.h"
 #include "entity/Entity.h"
+#include "rendering/Camera.h"
 
 class Renderer;
 
@@ -33,6 +34,8 @@ private:
 	std::unique_ptr<btCollisionDispatcher> dispatcher;
 	std::unique_ptr<btSequentialImpulseConstraintSolver> solver;
 	std::shared_ptr<btDiscreteDynamicsWorld> dynamic_world;
+
+	Camera camera;
 
 	CustomCallback callback;
 

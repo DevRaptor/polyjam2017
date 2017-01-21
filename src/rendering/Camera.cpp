@@ -13,6 +13,7 @@ Camera::Camera(float fov, float near, float far)
 	float ratio = resolution_x / resolution_y;
 
 	position = glm::vec3(1, 1, 0);
+	observedObjectsPosition = glm::vec3(0, 0, 0);
 
 	projection = glm::perspective(glm::radians(fov), ratio, near, far);
 }
@@ -24,15 +25,16 @@ Camera::~Camera()
 glm::mat4 Camera::GetMVP()
 {
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), -position);
-	glm::mat4 view = glm::mat4_cast(glm::conjugate(rotation));
+	//glm::mat4 view = glm::mat4_cast(glm::conjugate(rotation));
+	glm::mat4 view = glm::lookAt(position, observedObjectsPosition, glm::vec3(-1, 0, 0));
 	return projection * view * model;
 }
 
 void Camera::Update()
 {
-	glm::vec3 pos = glm::vec3(0, 0, 0);
+	//glm::vec3 pos = glm::vec3(0, 0, 0);
 
-	if (GameModule::input->GetKeyState(SDL_SCANCODE_A))
+	/*if (GameModule::input->GetKeyState(SDL_SCANCODE_A))
 		pos.x = -1.0f;
 	else if (GameModule::input->GetKeyState(SDL_SCANCODE_D))
 		pos.x = 1.0f;
@@ -54,7 +56,7 @@ void Camera::Update()
 		glm::vec2 v = mouse_delta * rotation_speed;
 		glm::quat rot = glm::angleAxis(-v.x, glm::vec3(0, 1, 0)) * glm::angleAxis(-v.y, GetRight());
 		Rotate(rot);
-	}
+	}*/
 }
 
 
@@ -79,4 +81,14 @@ void Camera::Move(const glm::vec3& direction)
 void Camera::Rotate(const glm::quat &rot) 
 {
 	rotation = glm::normalize(rot) * rotation;
+}
+
+void Camera::Translate(glm::vec3 position)
+{
+	this->position = position;
+}
+
+void Camera::LookAt(glm::vec3 position)
+{
+	observedObjectsPosition = position;
 }
