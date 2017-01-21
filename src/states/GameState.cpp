@@ -117,11 +117,19 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
-				explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
+				
+				if (std::chrono::high_resolution_clock::now() > (*it)->GetTimeOfDeath() + std::chrono::milliseconds(GameModule::resources->GetIntParameter("explosion_delay")))
+				{
+					explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
+					players[activeplayerid]->points += (*it)->points;
+					it = entities.erase(it);
+				}
 			}
-
-			players[activeplayerid]->points += (*it)->points;
-			it = entities.erase(it);
+			else
+			{
+				players[activeplayerid]->points += (*it)->points;
+				it = entities.erase(it);
+			}
 		}
 		else
 		{

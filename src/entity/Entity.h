@@ -8,6 +8,7 @@
 #include "rendering/Mesh.h"
 #include "modules/GameModule.h"
 #include "entity/PhysicBody.h"
+#include <chrono>
 
 //EntityType declaration in PhysicBody
 
@@ -21,7 +22,7 @@ public:
 	Entity(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
 		glm::vec3 start_pos, glm::vec3 init_scale, double initWaveRadius = 0)
 		: world(world_ptr), pos(start_pos), scale(init_scale),
-		destroyed(false), waveRadius{ initWaveRadius }
+		destroyed(false), waveRadius{ initWaveRadius }, timeOfDeath{std::chrono::high_resolution_clock::now()}
 	{
 		type = EntityType::NONE;
 	}
@@ -60,9 +61,10 @@ public:
 
 	double GetWaveRadius() { return waveRadius; }
 
-	void Destroy() { destroyed = true; }
+	void Destroy() { destroyed = true; timeOfDeath = std::chrono::high_resolution_clock::now(); }
 	bool IsDestroyed() { return destroyed; }
 
+	std::chrono::high_resolution_clock::time_point GetTimeOfDeath() { return timeOfDeath; }
 	RigidBody* GetRigidBody() { return physic_body->body.get(); }
 	glm::vec3 GetPosition() 
 	{
@@ -90,4 +92,5 @@ protected:
 	glm::vec3 scale;
 	bool destroyed;
 	double waveRadius;
+	std::chrono::high_resolution_clock::time_point timeOfDeath;
 };
