@@ -25,9 +25,7 @@ public:
 
 private:
 
-	std::shared_ptr<Entity> ship;
-	std::vector<std::shared_ptr<Entity>> meteors;
-	std::vector<std::shared_ptr<Entity>> bullets;
+	std::vector<std::shared_ptr<Entity>> entities;
 
 	//physics
 	std::unique_ptr<btBroadphaseInterface> broad_phase;

@@ -89,19 +89,7 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 	shader_program->UseProgram();
 
 	glUniformMatrix4fv(mvp_uniform, 1, GL_FALSE, &mvp[0][0]);
-	if (game_state->ship)
-	{
-		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(game_state->ship->transform_mat));
-		game_state->ship->Draw();
-	}
-
-	for (auto ptr : game_state->meteors)
-	{
-		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(ptr->transform_mat));
-		ptr->Draw();
-	}
-
-	for (auto ptr : game_state->bullets)
+	for (auto ptr : game_state->entities)
 	{
 		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(ptr->transform_mat));
 		ptr->Draw();
