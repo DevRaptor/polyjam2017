@@ -5,15 +5,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-int Ship::points = 0;
-
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
 	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container), angle(0)
 {
 	type = EntityType::SHIP;
 	mesh = GameModule::resources->GetMesh("teapot");
-	
+
 	points = 0;
 
 	//index = indexer++;
@@ -85,7 +83,7 @@ void Ship::Update()
 		physic_body->body->setLinearVelocity(velocity);
 	}
 
-	
+
 	//shooting
 	/*
 	if ((std::chrono::high_resolution_clock::now() > shoot_timer)
@@ -97,7 +95,7 @@ void Ship::Update()
 	}*/
 
 	glm::vec2 mousePosition = GameModule::input->GetMousePos();
-	float newAngle = -atan2(mousePosition[1] - GameModule::resources->GetIntParameter("resolution_y")/2, mousePosition[0] - GameModule::resources->GetIntParameter("resolution_x")/2) - glm::radians(90.0f);
+	float newAngle = -atan2(mousePosition[1] - GameModule::resources->GetIntParameter("resolution_y") / 2, mousePosition[0] - GameModule::resources->GetIntParameter("resolution_x") / 2) - glm::radians(90.0f);
 	if (abs(newAngle - angle) > 0.01)
 	{
 		angle = newAngle;
@@ -113,7 +111,7 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 	physic_body->body->getMotionState()->getWorldTransform(transform);
 	btVector3 pos = transform.getOrigin();
 
-	*direction *= move_speed*5;
+	*direction *= move_speed * 5;
 
 	/*
 	if (direction->getZ() > 0 && limit)
@@ -125,7 +123,7 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 		direction->setX(0);
 	else if (direction->getX() < 0 && limit)
 		direction->setX(0);
-		*/	
+		*/
 
 	physic_body->body->activate(true);
 
@@ -134,10 +132,22 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 	physic_body->body->setDamping(0.9999, 0);
 }
 
+bool Ship::AlreadyShot()
+{
+	return shot;
+}
+
+void Ship::QuitShooting()
+{
+	shot = false;
+}
+
 void Ship::DoShoot()
 {
 	if (std::chrono::high_resolution_clock::now() > shoot_timer)
 	{
+		shot = true;
+
 		Shoot();
 
 		shoot_timer = std::chrono::high_resolution_clock::now() + shoot_delay;

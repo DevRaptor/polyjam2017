@@ -37,7 +37,7 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 
 GameState::~GameState()
 {
-	Logger::Log("Close gameplay with: ", Ship::points, " points\n");
+	Logger::Log("Close gameplay with: 0 points\n");
 }
 
 void GameState::Update(std::chrono::milliseconds delta_time)
@@ -45,44 +45,53 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-
-
-	static std::chrono::high_resolution_clock::time_point switchtimer = std::chrono::high_resolution_clock::now();
-	if (GameModule::input->GetKeyState(SDL_SCANCODE_SLASH)
-		&& (std::chrono::high_resolution_clock::now() > switchtimer))
+	//TURNSYSTEM
+	
+	if ((std::chrono::high_resolution_clock::now() > playertimer) || players[activeplayerid]->AlreadyShot())
 	{
-		++activeplayerid;
-		activeplayerid %= players.size();
+		if (!blockinput)
+		{
+			blockinput = true;
+			ResetDestructTimer();
+		}
+		//camera change to show destructions
+	}
 
-		switchtimer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+	if (blockinput && DestructionsEnded())
+	{
+		//fade in effect
+		NextPlayer();
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
 	{
 		if (i == activeplayerid)
 		{
-			if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+			if (!blockinput) 
 			{
-				players[i]->DoShoot();
+				if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+				{
+					players[i]->DoShoot();
+				}
+
+				btVector3* tempvec = new btVector3(0, 0, 0);
+
+				if (GameModule::input->GetKeyState(SDL_SCANCODE_W) ||
+					GameModule::input->GetKeyState(SDL_SCANCODE_UP))
+					tempvec->setX(-1);
+				else if (GameModule::input->GetKeyState(SDL_SCANCODE_S) ||
+					GameModule::input->GetKeyState(SDL_SCANCODE_DOWN))
+					tempvec->setX(1);
+
+				if (GameModule::input->GetKeyState(SDL_SCANCODE_A) ||
+					GameModule::input->GetKeyState(SDL_SCANCODE_LEFT))
+					tempvec->setZ(1);
+				else if (GameModule::input->GetKeyState(SDL_SCANCODE_D) ||
+					GameModule::input->GetKeyState(SDL_SCANCODE_RIGHT))
+					tempvec->setZ(-1);
+
+				players[i]->Move(tempvec);
 			}
-
-			btVector3* tempvec = new btVector3(0, 0, 0);
-
-			if (GameModule::input->GetKeyState(SDL_SCANCODE_W) ||
-				GameModule::input->GetKeyState(SDL_SCANCODE_UP))
-				tempvec->setX(-1);
-			else if (GameModule::input->GetKeyState(SDL_SCANCODE_S) ||
-				GameModule::input->GetKeyState(SDL_SCANCODE_DOWN))
-				tempvec->setX(1);
-
-			if (GameModule::input->GetKeyState(SDL_SCANCODE_A) ||
-				GameModule::input->GetKeyState(SDL_SCANCODE_LEFT))
-				tempvec->setZ(1);
-			else if (GameModule::input->GetKeyState(SDL_SCANCODE_D) ||
-				GameModule::input->GetKeyState(SDL_SCANCODE_RIGHT))
-				tempvec->setZ(-1);
-
-			players[i]->Move(tempvec);
 		}
 
 
@@ -99,7 +108,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		}
 	}
 
-	std::vector<btVector3> explosion_positions;
+	std::vector<std::pair<btVector3, double >> explosion_positions;
 
 	auto it = entities.begin();
 	while (it != entities.end())
@@ -108,7 +117,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
-				explosion_positions.push_back((*it)->GetPhysicPosition());
+				explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
 			}
 
 			it = entities.erase(it);
@@ -126,7 +135,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	for (auto& pos : explosion_positions)
 	{
-		Explosion(pos);
+		Explosion(pos.first, pos.second);
 	}
 
 	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
@@ -138,23 +147,67 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
+	static std::chrono::high_resolution_clock::time_point points_timer = std::chrono::high_resolution_clock::now();
+	if (GameModule::input->GetKeyState(SDL_SCANCODE_P)
+		&& (std::chrono::high_resolution_clock::now() > points_timer))
+	{
+		std::cout << "=====Scoreboard======\n";
+		for(int i = 0; i < players.size(); i++)
+		{
+			std::cout << "player " << i << " has: " << players[i]->points << "\n";
+		}
+
+		points_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+	}
+
 	if (players.size() > 0)
 	{
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		//camera.LookAt(players.front()->GetPosition());
 	}
 
-
-
-
 	CheckTriggers();
-	
 }
 
+void GameState::NextPlayer()
+{
+	if(activeplayerid != -1) //first iteration AccessViolation exception
+		players[activeplayerid]->QuitShooting();
+
+	++activeplayerid;
+	activeplayerid %= players.size();
+
+	//fade out - probably another timer
+
+	ResetTurnTimer();
+
+	blockinput = false;
+}
+
+void GameState::ResetTurnTimer()
+{
+	playertimer = std::chrono::high_resolution_clock::now() +
+		std::chrono::seconds(GameModule::resources->GetIntParameter("turnlenght"));
+}
+
+void GameState::ResetDestructTimer()
+{
+	destruct_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(3); //temp
+}
+
+bool GameState::DestructionsEnded()
+{	
+	if (std::chrono::high_resolution_clock::now() > destruct_timer)
+	{
+		destruct_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(3);
+
+		return true;
+	}
+	return false;
+}
 
 void GameState::SpawnObstacles()
 {
-
 	/*
 	x goes from 0 and below
 	don't touch y
@@ -168,7 +221,7 @@ void GameState::SpawnObstacles()
 
 
 	float object_size = 3;
-	
+
 	int no_spawn_chance = 20;
 	int light_spawn_chance = 10;
 	int heavy_spawn_chance = 10;
@@ -178,6 +231,8 @@ void GameState::SpawnObstacles()
 
 	glm::vec3 scale(1, 1, 1);
 
+
+	static const double explosionRadius = 5;
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
 		for (int j = 0; j <= obstacles_amount_per_wall; j++)
@@ -206,19 +261,19 @@ void GameState::SpawnObstacles()
 
 				if (rand_obstacle_type < expl_spawn_chance)
 				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale);
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
 				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale);
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
 				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale);
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
 				}
@@ -229,23 +284,27 @@ void GameState::SpawnObstacles()
 	}
 }
 
-
 void GameState::InitGameplay()
 {
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
-	for (int i = 0; i < 5; i++) //raptor said 4
+	ResetDestructTimer();
+	ResetTurnTimer();
+
+	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
 		AddPlayer(glm::vec3(i * 15, 0, i * 15));
 	}
-	activeplayerid = 0;
+	activeplayerid = -1;
+	NextPlayer(); //hack to init turntimer properly
 
 	SpawnObstacles();
 }
 
+
+
 void GameState::AddFloor()
 {
-
 	groundShape = std::make_shared<btStaticPlaneShape>(btVector3(0, 1, 0), 0);
 
 	groundMotionState = std::make_shared<btDefaultMotionState>(btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, -1, 0)));
@@ -276,25 +335,24 @@ void GameState::AddPlayer(glm::vec3 startpos)
 
 void GameState::RestartGameplay()
 {
-	Logger::Log("Restart gameplay, points: ", Ship::points, "\n");
+	Logger::Log("Restart gameplay, points: 0\n");
 
 	entities.clear();
 
 	InitGameplay();
 }
 
-void GameState::Explosion(btVector3& pos)
+void GameState::Explosion(btVector3& pos, double radius)
 {
-
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1));
+			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1), 0);
 		obj->Init();
 		entities.push_back(obj);
 	}
 
-	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(3, 3, 3));
+	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(radius, radius, radius), 0);
 	obj->Init();
 	entities.push_back(obj);
 }
@@ -320,12 +378,6 @@ void GameState::CheckTriggers()
 
 				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
 				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
-
-				/*if (obj0->GetType() == EntityType::BULLET || obj1->GetType() == EntityType::BULLET)
-				{
-					obj0->GetOwner()->Destroy();
-					obj1->GetOwner()->Destroy();
-				}*/
 
 				if (obj0->GetType() == EntityType::EXPLOSION && obj1->GetType() == EntityType::OBSTACLE_HEAVY)
 				{

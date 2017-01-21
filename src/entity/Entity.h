@@ -16,10 +16,12 @@ class Entity
 public:
 	glm::mat4 transform_mat;
 
+	int points = 0;
+
 	Entity(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
-		glm::vec3 start_pos, glm::vec3 init_scale)
+		glm::vec3 start_pos, glm::vec3 init_scale, double initWaveRadius = 0)
 		: world(world_ptr), pos(start_pos), scale(init_scale),
-		destroyed(false)
+		destroyed(false), waveRadius{ initWaveRadius }
 	{
 		type = EntityType::NONE;
 	}
@@ -31,6 +33,9 @@ public:
 
 	virtual void DoShoot() {}
 	virtual void Move(btVector3* direction) {}
+	virtual bool AlreadyShot() { return false; }
+	virtual void QuitShooting() {};
+
 	void Rotate(double angleInDegrees)
 	{
 		btQuaternion qNewOrientation;
@@ -52,6 +57,8 @@ public:
 	}
 
 	EntityType GetType() { return type; }
+
+	double GetWaveRadius() { return waveRadius; }
 
 	void Destroy() { destroyed = true; }
 	bool IsDestroyed() { return destroyed; }
@@ -82,4 +89,5 @@ protected:
 	glm::vec3 pos;
 	glm::vec3 scale;
 	bool destroyed;
+	double waveRadius;
 };

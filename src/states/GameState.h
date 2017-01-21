@@ -24,9 +24,20 @@ public:
 
 	void Update(std::chrono::milliseconds delta_time);
 
+	std::chrono::high_resolution_clock::time_point playertimer;
+
 private:
 	std::vector<std::shared_ptr<Entity>> players;
 	std::vector<std::shared_ptr<Entity>> entities;
+
+	bool blockinput = false;
+	void NextPlayer();
+	bool DestructionsEnded();
+
+	void ResetTurnTimer();
+
+	std::chrono::high_resolution_clock::time_point destruct_timer;
+	void ResetDestructTimer();
 
 	//physics
 	std::unique_ptr<btBroadphaseInterface> broad_phase;
@@ -62,7 +73,7 @@ private:
 		float scale_min;
 		float scale_max;
 		float distortion;
-
+		
 		int min_delay; //in ms
 		int default_delay; //in ms
 		std::chrono::milliseconds delay; //time to next shoot
@@ -75,5 +86,5 @@ private:
 	void InitGameplay();
 	void RestartGameplay();
 
-	void Explosion(btVector3& pos);
+	void Explosion(btVector3& pos, double radius);
 };
