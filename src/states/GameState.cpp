@@ -44,14 +44,13 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	auto it = players.begin();
-	while (it != players.end())
+	for (std::size_t i = 0; i < players.size(); ++i)
 	{
-		if ((*it)->index == activeplayerid)
+		if (i == activeplayerid)
 		{
 			if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
 			{
-				(*it)->DoShoot();
+				players[i]->DoShoot();
 			}
 
 			btVector3* tempvec = new btVector3(0, 0, 0);
@@ -70,26 +69,25 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				GameModule::input->GetKeyState(SDL_SCANCODE_RIGHT))
 				tempvec->setZ(-1);
 
-			(*it)->Move(tempvec);
+			players[i]->Move(tempvec);
 		}
 
 
-		if ((*it)->IsDestroyed())
+		if (players[i]->IsDestroyed())
 		{
-			it = players.erase(it);
+			players.erase(players.begin() + i);
+			--i;
 		}
 		else
 		{
-			(*it)->Update();
+			players[i]->Update();
 
-			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
-
-			++it;
+			dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
 		}
 	}
 
 
-	it = entities.begin();
+	auto it = entities.begin();
 	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
@@ -130,7 +128,6 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	if (players.size() > 0)
 	{
 		camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
-		//camera.LookAt(players.front()->GetPosition());
 	}
 }
 

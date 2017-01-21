@@ -16,8 +16,6 @@ class Entity
 public:
 	glm::mat4 transform_mat;
 
-	int index = 0;
-
 	Entity(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
 		glm::vec3 start_pos, glm::vec3 init_scale)
 		: world(world_ptr), pos(start_pos), scale(init_scale),
