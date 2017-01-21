@@ -232,14 +232,15 @@ void GameState::ResetTurnTimer()
 
 void GameState::ResetDestructTimer()
 {
-	destruct_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(3); //temp
+	destruct_timer = std::chrono::high_resolution_clock::now() +
+		std::chrono::seconds(GameModule::resources->GetIntParameter("destructime"));
 }
 
 bool GameState::DestructionsEnded()
 {	
 	if (std::chrono::high_resolution_clock::now() > destruct_timer)
 	{
-		destruct_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(3);
+		ResetDestructTimer();
 
 		return true;
 	}

@@ -17,7 +17,10 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		mesh = GameModule::resources->GetMesh("obstacle_light");
 	}
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
+	{
+		points = 20;
 		mesh = GameModule::resources->GetMesh("obstacle_explosive");
+	}
 	else if (type == EntityType::PARTICLE)
 	{
 		points = 0;
@@ -76,7 +79,8 @@ void Obstacle::Update()
 	}
 	else if (type == EntityType::PARTICLE)
 	{
-		if (std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(2000))
+		if (std::chrono::high_resolution_clock::now() > spawnTime +
+			std::chrono::milliseconds(GameModule::resources->GetIntParameter("particlelifetime")))
 			Destroy();
 		else
 		{
