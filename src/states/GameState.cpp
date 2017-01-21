@@ -379,13 +379,15 @@ void GameState::CheckTriggers()
 				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
 				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
 
-				if (obj0->GetType() == EntityType::EXPLOSION && obj1->GetType() == EntityType::OBSTACLE_HEAVY)
+				if (obj0->GetType() == EntityType::EXPLOSION 
+					&& (obj1->GetType() == EntityType::OBSTACLE_HEAVY || obj1->GetType() == EntityType::OBSTACLE_EXPLOSIVE || obj1->GetType() == EntityType::OBSTACLE_LIGHT))
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();
 				}
 
-				if (obj1->GetType() == EntityType::EXPLOSION && obj0->GetType() == EntityType::OBSTACLE_HEAVY)
+				if (obj1->GetType() == EntityType::EXPLOSION
+					&& (obj0->GetType() == EntityType::OBSTACLE_HEAVY || obj0->GetType() == EntityType::OBSTACLE_EXPLOSIVE || obj0->GetType() == EntityType::OBSTACLE_LIGHT))
 				{
 					obj0->GetOwner()->Destroy();
 					obj1->GetOwner()->Destroy();
