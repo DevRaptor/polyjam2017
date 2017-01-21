@@ -69,7 +69,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			if (!blockinput) 
 			{
-				if (GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+				if (GameModule::input->IsLeftMouseButtonPressed())
 				{
 					players[i]->DoShoot();
 				}
