@@ -9,7 +9,9 @@
 enum class EntityType
 {
 	SHIP,
-	OBSTACLE,
+	OBSTACLE_LIGHT,
+	OBSTACLE_HEAVY,
+	OBSTACLE_EXPLOSIVE,
 	PARTICLE, //obstacle class
 	BULLET,
 	NONE

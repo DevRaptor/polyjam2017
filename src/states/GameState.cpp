@@ -106,7 +106,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		if ((*it)->IsDestroyed())
 		{
-			if ((*it)->GetType() == EntityType::OBSTACLE)
+			if ((*it)->GetType() == EntityType::OBSTACLE_HEAVY)
 			{
 				explosion_positions.push_back((*it)->GetPhysicPosition());
 			}
@@ -180,7 +180,7 @@ void GameState::SpawnObstacles()
 			{
 				glm::vec3 pos(start_x + i * object_size, 0, start_z + j * object_size);
 
-				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE, dynamic_world, pos, scale);
+				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale);
 				obj->Init();
 				entities.push_back(obj);
 			}
