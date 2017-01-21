@@ -5,6 +5,7 @@
 #include "modules/GameModule.h"
 
 Camera::Camera(float fov, float near, float far)
+	: view(1.0f)
 {
 	move_speed = GameModule::resources->GetFloatParameter("camera_move_speed");
 	rotation_speed = GameModule::resources->GetFloatParameter("camera_rotation_speed");
@@ -26,7 +27,7 @@ glm::mat4 Camera::GetMVP()
 {
 	glm::mat4 model = glm::translate(glm::mat4(1.0f), -position);
 	//glm::mat4 view = glm::mat4_cast(glm::conjugate(rotation));
-	glm::mat4 view = glm::lookAt(position, observedObjectsPosition, glm::vec3(-1, 0, 0));
+	//glm::mat4 view = glm::lookAt(position, observedObjectsPosition, glm::vec3(-1, 0, 0));
 	return projection * view * model;
 }
 
@@ -91,4 +92,5 @@ void Camera::Translate(glm::vec3 position)
 void Camera::LookAt(glm::vec3 position)
 {
 	observedObjectsPosition = position;
+	view = glm::lookAt(this->position, observedObjectsPosition, glm::vec3(-1, 0, 0));
 }

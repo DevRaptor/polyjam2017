@@ -24,6 +24,8 @@ private:
 	float move_speed;
 	float rotation_speed;
 
+	glm::mat4 view;
+
 
 	glm::vec3 GetUp();
 	glm::vec3 GetRight();

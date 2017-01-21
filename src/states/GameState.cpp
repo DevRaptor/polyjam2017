@@ -127,11 +127,11 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
-	/*if (players.size() > 0)
+	if (players.size() > 0)
 	{
 		camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
-		camera.LookAt(players.front()->GetPosition());
-	}*/
+		//camera.LookAt(players.front()->GetPosition());
+	}
 }
 
 void GameState::SpawnObstacle()
@@ -174,6 +174,7 @@ void GameState::RestartGameplay()
 {
 	Logger::Log("Restart gameplay, points: ", Ship::points, "\n");
 
+	players.clear();
 	entities.clear();
 
 	InitGameplay();
