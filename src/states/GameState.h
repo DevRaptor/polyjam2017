@@ -42,7 +42,7 @@ private:
 	int activeplayerid;
 	//playersamount is ship::indexer;
 
-	void AddPlayer();
+	void AddPlayer(glm::vec3 startpos);
 
 	struct
 	{

@@ -44,6 +44,15 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
+	//debug
+	
+	if (GameModule::input->GetKeyState(SDL_SCANCODE_SLASH))
+	{
+		++activeplayerid;
+		activeplayerid %= 4;
+		std::cout << " KURWA! " << activeplayerid << "\n";
+	}
+
 	auto it = players.begin();
 	while (it != players.end())
 	{
@@ -129,7 +138,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (players.size() > 0)
 	{
-		camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
+		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		//camera.LookAt(players.front()->GetPosition());
 	}
 }
@@ -156,14 +165,18 @@ void GameState::InitGameplay()
 {
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
-	AddPlayer();
+	for (int i = 0; i < 4; i++) //raptor said 4
+	{
+		AddPlayer(glm::vec3(i*15,0,i*15));
+	}
+	
 
 	activeplayerid = 0;
 }
 
-void GameState::AddPlayer()
+void GameState::AddPlayer(glm::vec3 startpos)
 {
-	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
+	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities);
 	obj->Init();
 	players.push_back(obj);
 	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
