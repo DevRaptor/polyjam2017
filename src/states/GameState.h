@@ -59,7 +59,7 @@ private:
 		std::chrono::high_resolution_clock::time_point timer;
 	} obstacle_data;
 
-	void SpawnObstacle();
+	void SpawnObstacles();
 
 	void InitGameplay();
 	void RestartGameplay();
