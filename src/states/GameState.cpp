@@ -43,48 +43,21 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
-	if (ship)
-	{
-		ship->Update();
-
-		//must check collisions between ship and meteors
-		dynamic_world->contactTest(ship->GetRigidBody(), callback);
-
-		if (ship->IsDestroyed())
-			RestartGameplay();
-	}
-	else
-		RestartGameplay();
-
-
-	auto it = bullets.begin();
-	while (it != bullets.end())
+	auto it = entities.begin();
+	while (it != entities.end())
 	{
 		if ((*it)->IsDestroyed())
 		{
-			it = bullets.erase(it);
+			it = entities.erase(it);
 		}
 		else
 		{
 			(*it)->Update();
 
-			//must check collisions between bullets and meteors
-			dynamic_world->contactTest((*it)->GetRigidBody(), callback);
+			//dynamic_world->contactTest((*it)->GetRigidBody(), callback);
 
 			++it;
 		}
-	}
-
-
-	auto iter = meteors.begin();
-	while (iter != meteors.end())
-	{
-		(*iter)->Update();
-
-		if ((*iter)->IsDestroyed())
-			iter = meteors.erase(iter);
-		else
-			++iter;
 	}
 
 
@@ -124,24 +97,23 @@ void GameState::SpawnMeteor()
 
 	auto meteor = std::make_shared<Meteor>(dynamic_world, pos, scale);
 	meteor->Init();
-	meteors.push_back(meteor);
+	entities.push_back(meteor);
 }
 
 void GameState::InitGameplay()
 {
 	meteor_data.delay = std::chrono::milliseconds(meteor_data.default_delay);
 
-	ship = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), bullets);
-	ship->Init();
+	auto obj = std::make_shared<Ship>(dynamic_world, glm::vec3(0, 0, 0), entities);
+	obj->Init();
+	entities.push_back(obj);
 }
 
 void GameState::RestartGameplay()
 {
 	Logger::Log("Restart gameplay, points: ", Ship::points, "\n");
 
-	ship.reset();
-	meteors.clear();
-	bullets.clear();
+	entities.clear();
 
 	InitGameplay();
 }
