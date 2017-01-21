@@ -68,13 +68,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		NextPlayer();
 	}
 
-	if (fade && fadeout_coef > 0.0f)
+	if (fade)
 	{
-		fadeout_coef -= 0.5f * delta;
+		if(fadeout_coef > 0.0f)
+			fadeout_coef -= fadeout_speed * delta;
 	}
 	else if (fadeout_coef < 1.0f)
 	{
-		fadeout_coef += 0.5f * delta;
+		fadeout_coef += fadeout_speed * delta;
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)

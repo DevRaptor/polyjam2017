@@ -34,6 +34,7 @@ private:
 	bool blockshooting = false;
 	bool fade = false;
 	float fadeout_coef = 1.0f; //coefficient of screen fadeout where 1 is clear, 0 is fully faded
+	float fadeout_speed = 0.5f;
 
 	void NextPlayer();
 	bool DestructionsEnded();
