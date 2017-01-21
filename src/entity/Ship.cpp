@@ -9,7 +9,7 @@ Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_p
 	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container)
 {
 	type = EntityType::SHIP;
-	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
+	mesh = GameModule::resources->GetMesh("teapot");
 	
 	points = 0;
 

@@ -208,7 +208,7 @@ void GameState::AddFloor()
 
 	floor_transform = glm::make_mat4(matrix);// *glm::scale(glm::mat4(1.0f), scale);
 
-	floor_mesh = GameModule::resources->GetMesh("data/models/floor.obj");
+	floor_mesh = GameModule::resources->GetMesh("floor");
 
 }
 

@@ -10,7 +10,7 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	if (!LoadOBJ(model_name, vertices, uvs, normals))
+	if (!LoadOBJ("data/models/"+model_name+".obj", vertices, uvs, normals))
 		return;
 
 
@@ -40,13 +40,14 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 
 	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(2);
 
 
 	//texture
 	int width, height, channels;
-	unsigned char *img = SOIL_load_image("Data/textures/texture.png",
+	std::string name = "data/textures/" + model_name + ".png";
+	unsigned char *img = SOIL_load_image(name.c_str(),
 		&width,
 		&height,
 		&channels,
@@ -100,6 +101,7 @@ Mesh::~Mesh()
 void Mesh::Draw()
 {
 	glBindVertexArray(vao);
+	glActiveTexture(GL_TEXTURE0);
 
 	glBindTexture(GL_TEXTURE_2D, texture);
 

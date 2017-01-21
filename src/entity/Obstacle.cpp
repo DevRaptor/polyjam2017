@@ -4,7 +4,7 @@ Obstacle::Obstacle(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3
 	: Entity(world_ptr, start_pos, scale)
 {
 	type = EntityType::OBSTACLE;
-	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
+	mesh = GameModule::resources->GetMesh("teapot");
 }
 
 void Obstacle::Init()
