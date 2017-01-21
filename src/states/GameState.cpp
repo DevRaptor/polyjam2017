@@ -28,7 +28,7 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	dynamic_world = std::make_shared<btDiscreteDynamicsWorld>(dispatcher.get(), broad_phase.get(),
 		solver.get(), collision_config.get());
 
-	dynamic_world->setGravity(btVector3(0, 0, 0));
+	dynamic_world->setGravity(btVector3(0, -10, 0));
 
 	AddFloor();
 
@@ -344,12 +344,20 @@ void GameState::RestartGameplay()
 
 void GameState::Explosion(btVector3& pos, double radius)
 {
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 20; i++)
 	{
+		std::uniform_real_distribution<> random(-5.0, 5.0);
+		std::uniform_real_distribution<> randpos(-0.5, 0.5);
+
+		glm::vec3 pos(random(GameModule::random_gen) + pos.getX(), random(GameModule::random_gen) + pos.getY(),
+			random(GameModule::random_gen) + pos.getZ());
+
 		auto obj = std::make_shared<Obstacle>(EntityType::PARTICLE, dynamic_world,
-			glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(1, 1, 1), 0);
+			pos, glm::vec3(1, 1, 1), 0);
 		obj->Init();
 		entities.push_back(obj);
+		obj->GetRigidBody()->applyCentralImpulse(btVector3(random(GameModule::random_gen), 10, 
+			random(GameModule::random_gen)));
 	}
 
 	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(radius, radius, radius), 0);
