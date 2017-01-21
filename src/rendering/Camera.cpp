@@ -97,7 +97,7 @@ void Camera::LookAt(glm::vec3 position)
 
 void Camera::Shake()
 {
-	if (isShaking && (shakeStartTime + std::chrono::milliseconds(1000) > std::chrono::high_resolution_clock::now()))
+	if (isShaking && (shakeStartTime + std::chrono::milliseconds(GameModule::resources->GetIntParameter("shake_duration")) > std::chrono::high_resolution_clock::now()))
 	{
 		std::uniform_real_distribution<double> random(0, 1.0);
 		position = position + glm::vec3(random(GameModule::random_gen), random(GameModule::random_gen), random(GameModule::random_gen));
