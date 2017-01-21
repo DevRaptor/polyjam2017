@@ -6,6 +6,8 @@
 #define GLEW_STATIC //needed to static link GLEW
 #include <GL/glew.h>
 
+#include <SDL.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
@@ -39,4 +41,6 @@ private:
 		std::vector<glm::vec3>& out_vertices,
 		std::vector<glm::vec2>& out_uvs,
 		std::vector<glm::vec3>& out_normals);
+
+	void LoadTexture(SDL_Surface* surface);
 };

@@ -74,6 +74,11 @@ find_package(SDL2 REQUIRED)
 include_directories( ${SDL2_INCLUDE_DIR})
 set(LIBRARIES ${LIBRARIES} ${SDL2_LIBRARY})
 
+# Find SDL_image
+find_package(SDL_image REQUIRED)
+include_directories( ${SDL_IMAGE_INCLUDE_DIRS})
+set(LIBRARIES ${LIBRARIES} ${SDL_IMAGE_LIBRARIES})
+
 # Find bullet
 find_package(Bullet REQUIRED)
 if( BULLET_FOUND )

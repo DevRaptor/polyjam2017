@@ -2,6 +2,8 @@
 
 #include <SOIL.h>
 
+#include <SDL_image.h>
+
 #include "utility/Log.h"
 
 Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
@@ -43,53 +45,25 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(2);
 
-
+	
 	//texture
 	int width, height, channels;
 	std::string name = "data/textures/" + model_name + ".png";
-	unsigned char *img = SOIL_load_image(name.c_str(),
-		&width,
-		&height,
-		&channels,
-		SOIL_LOAD_RGB);
+	
+	
 
-	/* check for an error during the load process */
-	if (!img) {
-		Logger::Log(SOIL_last_result(), "\n");
-	}
-	else
+	SDL_Surface* surface;
+	surface = IMG_Load(name.c_str());
+	if (!surface)
 	{
-		Logger::Log("SOIL loading succesfull\n");
-
-		// Reverse Y axis
-		std::vector<unsigned char> img_y_rev(width * height * channels, 0);
-		for (int i = 0; i < height; ++i) {
-			for (int j = 0; j < width; ++j) {
-				for (int k = 0; k < channels; ++k) {
-					img_y_rev[(height - i - 1)*width * 3 + j * 3 + k]
-						= img[i * width * 3 + j * 3 + k];
-				}
-			}
-		}
-
-		texture = 0;
-		glActiveTexture(GL_TEXTURE0);
-		glGenTextures(1, &texture);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 4);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, &img_y_rev[0]);
-
-		glGenerateMipmap(GL_TEXTURE_2D);
-
-		SOIL_free_image_data(img);
+		Logger::Log("Error, graphic with name: ", name, " and path: ", name, " is not found\n");
+		SDL_FreeSurface(surface);
 	}
 
-	SetPosition(pos);
+	LoadTexture(surface);
+
+	//SDL_FreeSurface(surface);
+	
 }
 
 Mesh::~Mesh()
@@ -217,4 +191,20 @@ bool Mesh::LoadOBJ(const std::string& file_name,
 	}
 	fclose(file);
 	return true;
+}
+
+void Mesh::LoadTexture(SDL_Surface* surface)
+{
+	Logger::Log("LoadTexture");
+	SDL_SetSurfaceAlphaMod(surface, 255);
+	Logger::Log("alpha\n");
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	Logger::Log("before surface access\n", surface->w, " - ", surface->h, "\n");
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
 }
