@@ -21,3 +21,6 @@ meteor_max_distortion=2.0
 meteor_delay=2000
 meteor_delay_min=50
 bullet_move_speed=12.0
+turnlenght=6
+DEBUG_turns=1
+playersamount=4
