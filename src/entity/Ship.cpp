@@ -169,9 +169,7 @@ void Ship::Shoot()
 
 	std::cout << direction[0] << " " << direction[1] << " " << direction[2] << "\n";
 
-	//uncomment this if collisions will fuck up projectiles
-	//glm::vec3 pos(vec.getX() + 2*direction[0], vec.getY(), vec.getZ() + 2*direction[2]);
-	glm::vec3 pos(vec.getX(), vec.getY(), vec.getZ());
+	glm::vec3 pos(vec.getX() + 2*direction[0], vec.getY(), vec.getZ() + 2*direction[2]);
 
 	auto bullet = std::make_shared<Bullet>(world.lock(), pos, glm::vec3(0.3f, 0.3f, 0.3f), glm::vec2(direction[2], direction[0]));
 	bullet->Init();
