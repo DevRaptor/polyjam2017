@@ -47,7 +47,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	//TURNSYSTEM - stateslike
 	
-	if ((std::chrono::high_resolution_clock::now() > playertimer) || players[activeplayerid]->AlreadyShot())
+	if (players[activeplayerid]->AlreadyShot())
 	{
 		if (!blockshooting)
 		{
@@ -57,8 +57,17 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		//camera change to show destructions
 	}
 
-	if (blockshooting && DestructionsEnded())
-	{		
+	if ((blockshooting && 
+		(DestructionsEnded() || GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))) ||
+		(std::chrono::high_resolution_clock::now() > playertimer))
+	{	
+		if (blockshooting)
+			std::cout << "1\n";
+		if (DestructionsEnded())
+			std::cout << "2\n";
+		if (std::chrono::high_resolution_clock::now() > playertimer)
+			std::cout << "3\n";
+
 		FadeInEffect();
 	}
 
@@ -234,6 +243,8 @@ void GameState::ResetDestructTimer()
 {
 	destruct_timer = std::chrono::high_resolution_clock::now() +
 		std::chrono::seconds(GameModule::resources->GetIntParameter("destructime"));
+
+	std::cout << GameModule::resources->GetIntParameter("destructime") << " KURWA\n";
 }
 
 bool GameState::DestructionsEnded()
