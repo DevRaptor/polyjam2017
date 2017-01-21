@@ -37,6 +37,7 @@ void Ship::Init()
 	//disable rotation
 	physic_body->body->setAngularFactor(btVector3(0, 0, 0));
 
+	Rotate(270.0f);
 }
 
 void Ship::Update()
@@ -81,7 +82,7 @@ void Ship::Update()
 		physic_body->body->setLinearVelocity(velocity);
 	}
 
-
+	
 	//shooting
 	/*
 	if ((std::chrono::high_resolution_clock::now() > shoot_timer)

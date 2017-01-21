@@ -93,7 +93,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			players[i]->Update();
 
-			dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
+			//dynamic_world->contactTest(players[i]->GetRigidBody(), callback);
 		}
 	}
 
