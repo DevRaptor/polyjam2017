@@ -101,7 +101,7 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 	physic_body->body->getMotionState()->getWorldTransform(transform);
 	btVector3 pos = transform.getOrigin();
 
-	*direction *= move_speed;
+	*direction *= move_speed*5;
 
 	/*
 	if (direction->getZ() > 0 && limit)
@@ -119,7 +119,7 @@ void Ship::Move(btVector3* direction) //ex (0,0,1) for up
 
 	physic_body->body->applyCentralImpulse(*direction);
 
-	physic_body->body->setDamping(move_damping, 0);
+	physic_body->body->setDamping(0.9999, 0);
 }
 
 void Ship::DoShoot()
