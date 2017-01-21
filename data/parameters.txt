@@ -30,3 +30,4 @@ DEBUG_turns=1
 playersamount=4
 shake_duration=500
 explosion_delay=50
+particles_quantity=10

@@ -368,7 +368,7 @@ void GameState::RestartGameplay()
 
 void GameState::Explosion(btVector3& pos, double radius)
 {
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < GameModule::resources->GetIntParameter("particles_quantity"); i++)
 	{
 		std::uniform_real_distribution<> random(-5.0, 5.0);
 		std::uniform_real_distribution<> randpos(-0.5, 0.5);
