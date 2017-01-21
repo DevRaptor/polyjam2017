@@ -11,15 +11,20 @@ public:
 
 	glm::mat4 GetMVP();
 	void Update();
+	void Translate(glm::vec3 position);
+	void LookAt(glm::vec3 position);
 
 private:
 	glm::mat4 projection;
 
 	glm::vec3 position;
+	glm::vec3 observedObjectsPosition;
 	glm::quat rotation;
 
 	float move_speed;
 	float rotation_speed;
+
+	glm::mat4 view;
 
 
 	glm::vec3 GetUp();

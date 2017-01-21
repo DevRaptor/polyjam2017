@@ -3,6 +3,7 @@
 #include "Bullet.h"
 
 int Ship::points = 0;
+int Ship::indexer = 0;
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
@@ -12,6 +13,8 @@ Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_p
 	mesh = GameModule::resources->GetMesh("data/models/teapot.obj");
 	
 	points = 0;
+
+	index = indexer++;
 
 	move_speed = GameModule::resources->GetFloatParameter("ship_move_speed");
 	move_damping = GameModule::resources->GetFloatParameter("ship_move_damping");
@@ -30,7 +33,7 @@ void Ship::Init()
 	physic_body = std::make_unique<PhysicBody>(world.lock(), pos, glm::vec3(1.0f, 1.0f, 1.0f), type, shared_from_this());
 
 	//only left/right movement
-	physic_body->body->setLinearFactor(btVector3(0, 0, 1));
+	physic_body->body->setLinearFactor(btVector3(1, 0, 1));
 
 	//disable rotation
 	physic_body->body->setAngularFactor(btVector3(0, 0, 0));
@@ -45,6 +48,7 @@ void Ship::Update()
 	physic_body->body->getMotionState()->getWorldTransform(transform);
 	btVector3 pos = transform.getOrigin();
 
+	/*
 	if (pos.getZ() < movement_limit &&
 		(GameModule::input->GetKeyState(SDL_SCANCODE_LEFT)
 			|| GameModule::input->GetKeyState(SDL_SCANCODE_A)))
@@ -69,7 +73,7 @@ void Ship::Update()
 	else
 	{
 		physic_body->body->setDamping(stop_damping, 0);
-	}
+	}*/
 
 	btVector3 velocity = physic_body->body->getLinearVelocity();
 	if (velocity.length() > move_speed_max)
@@ -80,8 +84,48 @@ void Ship::Update()
 
 
 	//shooting
+	/*
 	if ((std::chrono::high_resolution_clock::now() > shoot_timer)
 		&& GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+	{
+		Shoot();
+
+		shoot_timer = std::chrono::high_resolution_clock::now() + shoot_delay;
+	}*/
+}
+
+void Ship::Move(btVector3* direction) //ex (0,0,1) for up
+{
+	transform_mat = physic_body->GetTransformMatrix();
+
+	btTransform transform;
+	physic_body->body->getMotionState()->getWorldTransform(transform);
+	btVector3 pos = transform.getOrigin();
+
+	*direction *= move_speed;
+
+	/*
+	if (direction->getZ() > 0 && limit)
+		direction->setZ(0);
+	else if (direction->getZ() < 0 && limit)
+		direction->setZ(0);
+
+	if (direction->getX() > 0 && limit)
+		direction->setX(0);
+	else if (direction->getX() < 0 && limit)
+		direction->setX(0);
+		*/	
+
+	physic_body->body->activate(true);
+
+	physic_body->body->applyCentralImpulse(*direction);
+
+	physic_body->body->setDamping(move_damping, 0);
+}
+
+void Ship::DoShoot()
+{
+	if (std::chrono::high_resolution_clock::now() > shoot_timer)
 	{
 		Shoot();
 
