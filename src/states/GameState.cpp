@@ -143,6 +143,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		//camera.LookAt(players.front()->GetPosition());
 	}
+
+
+
+
+	CheckTriggers();
+	
 }
 
 void GameState::SpawnObstacles()
@@ -249,4 +255,36 @@ void GameState::Explosion(btVector3& pos)
 	obj->Init();
 	entities.push_back(obj);
 
+}
+
+void GameState::CheckTriggers()
+{
+	int numManifolds = dynamic_world->getDispatcher()->getNumManifolds();
+	for (int i = 0; i < numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = dynamic_world->getDispatcher()->getManifoldByIndexInternal(i);
+		auto  obA = static_cast<const btCollisionObject*>(contactManifold->getBody0());
+		auto  obB = static_cast<const btCollisionObject*>(contactManifold->getBody1());
+
+		int numContacts = contactManifold->getNumContacts();
+		for (int j = 0; j < numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance() < 0.f)
+			{
+				const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;
+
+				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
+				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
+
+				if (obj0->GetType() == EntityType::BULLET || obj1->GetType() == EntityType::BULLET)
+				{
+					obj0->GetOwner()->Destroy();
+					obj1->GetOwner()->Destroy();
+				}
+			}
+		}
+	}
 }
