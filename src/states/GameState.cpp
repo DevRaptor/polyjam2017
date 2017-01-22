@@ -105,6 +105,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << id << "\n";
 			id = (id + 1) % players.size();
 		}*/
+		std::cout << "id: " << id << "\n";
 		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
 
@@ -277,6 +278,9 @@ void GameState::NextPlayer()
 
 	blockshooting = false;
 	blockinput = false;
+
+	//portrait
+
 }
 
 void GameState::ResetTurnTimer()
@@ -504,8 +508,8 @@ void GameState::InitGameplay()
 	{
 		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i]);
 	}
-	activeplayerid = -1;
-	NextPlayer(); //hack to init turntimer properly
+	activeplayerid = 0;
+	///NextPlayer(); //hack to init turntimer properly
 
 	//SpawnObstaclesRand();
 	SpawnObstaclesGrid();
@@ -638,6 +642,22 @@ void GameState::MainMenuGui()
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big2", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
+
+
+	float resolution_x = GameModule::resources->GetIntParameter("resolution_x");
+	float resolution_y = GameModule::resources->GetIntParameter("resolution_y");
+
+	pos.x = /*resolution_x/2.0f -*/ 3; //pion!
+	pos.y = /*resolution_y/2.0f -*/ -3; //poziom
+
+	size = glm::vec2(0.2, 0.2);
+
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait3", pos, size));
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait", pos, size));
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait2", pos, size));
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait1", pos, size));
+	
+
 }
 
 void GameState::ShowNextPlayer(bool show, int player_id)
@@ -647,10 +667,12 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 		//must add player_id
 
 		next_player = players_graphics[player_id];
+		portrait = nullptr;
 	}
 	else
 	{
 		next_player = nullptr;
+		portrait = portraits[player_id];
 	}
 }
 

@@ -75,6 +75,10 @@ private:
 
 	std::shared_ptr<Mesh> next_player;
 
+	std::vector<std::shared_ptr<Mesh>> portraits;
+
+	std::shared_ptr<Mesh> portrait = nullptr;
+
 	int winner_id = -1;
 
 	void MainMenuGui();
