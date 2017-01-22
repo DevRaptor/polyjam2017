@@ -124,6 +124,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 			if (players[i]->GetHasWon())
 			{
+				exit(0);
 				//for (auto& obstacle : entities)
 				//{
 					//obstacle->Destroy();

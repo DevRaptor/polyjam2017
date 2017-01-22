@@ -79,7 +79,29 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	}
 	else if (type == EntityType::OBSTACLE_WIN_CONDITION)
 	{
-		mesh = GameModule::resources->GetMesh("particle");
+		//mesh = GameModule::resources->GetMesh("particle");
+		std::uniform_int_distribution<int> random(0, 3);
+		int number = random(GameModule::random_gen);
+		if (number == 0)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light");
+			this->scale = glm::vec3(1, 0.1, 1);
+		}
+		else if (number == 1)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_1");
+			this->scale = glm::vec3(1, 0.1, 1);
+		}
+		else if (number == 2)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_2");
+			this->scale = biggerScale;// glm::vec3(1.2, 0.1, 0.6);
+		}
+		else if (number == 3)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_3");
+			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
+		}
 	}
 }
 
