@@ -365,7 +365,7 @@ void GameState::SpawnObstaclesGrid()
 	float player_safe_space_size = 5;
 
 
-	float object_size = 3;
+	float object_size = 4;
 
 	int no_spawn_chance = GameModule::resources->GetIntParameter("no_spawn_chance");
 	int light_spawn_chance = GameModule::resources->GetIntParameter("light_spawn_chance");
@@ -394,8 +394,8 @@ void GameState::SpawnObstaclesGrid()
 		{
 			bool is_position_near_player = false;
 
-			float current_x = -20 + i * object_size;
-			float current_z = -20 + j * object_size;
+			float current_x = -80 + i * object_size;
+			float current_z = -80 + j * object_size;
 
 			for (std::size_t i = 0; i < players.size(); ++i)
 			{
