@@ -3,49 +3,50 @@
 Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale, double initWaveRadius)
 	: Entity(world_ptr, start_pos, scale, initWaveRadius), spawnTime{ std::chrono::high_resolution_clock::now() }
 {
-	glm::vec3 biggerScale(1.2, 0.5, 0.6);
+	glm::vec3 biggerScale(1.9, 0.5, 1);
 	type = obj_type;
 
 	if (type == EntityType::OBSTACLE_HEAVY)
 	{
 		points = 50;
 
-		std::uniform_int_distribution<int> random(0, 1);
+		std::uniform_int_distribution<int> random(0, 2);
 		int number = random(GameModule::random_gen);
-		if (number == 0)
+		if (number <= 1)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_heavy");
+			this->scale.x = 1.45;
+			this->scale.z = 1.45 ;
 		}
 		else
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_heavy_1");
 			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
 		}
-		this->scale.x = 1.5;
-		this->scale.z = 1.5;
+		//this->scale.z = 1.5;
 	}
 	else if (type == EntityType::OBSTACLE_LIGHT)
 	{
 		points = 10;
 
-		std::uniform_int_distribution<int> random(0, 3);
+		std::uniform_int_distribution<int> random(0, 5);
 		int number = random(GameModule::random_gen);
-		if (number == 0)
+		if (number < 2)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light");
 			this->scale = glm::vec3(1, 0.01, 1);
 		}
-		else if (number == 1)
+		else if (number < 4)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_1");
 			this->scale = glm::vec3(1, 0.01, 1);
 		}
-		else if (number == 2)
+		else if (number == 4)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_2");
 			this->scale = biggerScale;// glm::vec3(1.2, 0.1, 0.6);
 		}
-		else if (number == 3)
+		else if (number == 5)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_3");
 			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);

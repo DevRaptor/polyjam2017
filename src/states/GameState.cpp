@@ -379,6 +379,7 @@ void GameState::SpawnObstaclesGrid()
 	glm::vec3 scale(1, 0.5, 1);
 	glm::vec3 biggerScale(1, 0.1, 1);
 
+	bool super_wide_spawned = false;
 	bool win_spawned = false;
 	int win_spawn_pos = std::floorf( random_win_spawn(GameModule::random_gen) * obstacles_amount_per_wall * obstacles_amount_per_wall *
 		((1.0f * no_spawn_chance )/ (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance)));
@@ -392,6 +393,12 @@ void GameState::SpawnObstaclesGrid()
 	{
 		for (int j = 0; j <= obstacles_amount_per_wall; j++)
 		{
+			if (super_wide_spawned)
+			{
+				super_wide_spawned = false;
+				continue;
+			}
+			
 			bool is_position_near_player = false;
 
 			float current_x = -80 + i * object_size;
@@ -425,18 +432,22 @@ void GameState::SpawnObstaclesGrid()
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
+					if (obj->GetScale().x > 1.5)
+						super_wide_spawned = true;
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
 				{
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
+					if (obj->GetScale().x > 1.5)
+						super_wide_spawned = true;
 				}
 				else
 				{
 					if (win_spawn_pos > 0)
 						--win_spawn_pos;
-					else if(!win_spawned)
+					else if (!win_spawned)
 					{
 						auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, pos, scale, explosionRadius);
 						obj->Init();
@@ -445,7 +456,7 @@ void GameState::SpawnObstaclesGrid()
 						win_spawned = true;
 					}
 				}
-				
+			
 			}
 		}
 	}

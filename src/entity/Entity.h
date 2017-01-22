@@ -59,6 +59,8 @@ public:
 
 	EntityType GetType() { return type; }
 
+	glm::vec3 GetScale() { return scale;  }
+
 	double GetWaveRadius() { return waveRadius; }
 
 	void Destroy() { destroyed = true; timeOfDeath = std::chrono::high_resolution_clock::now(); }
