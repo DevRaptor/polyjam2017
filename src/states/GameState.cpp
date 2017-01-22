@@ -539,7 +539,7 @@ void GameState::SpawnObstaclesGrid()
 
 void GameState::InitGameplay()
 {
-	static const std::string playerNames[4] = { "player1", "player2" , "player3", "player4" };
+	static const std::string playerNames[4] = { "player4", "player1" , "player2", "player3" };
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	ResetDestructTimer();
@@ -682,7 +682,7 @@ void GameState::MainMenuGui()
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big1", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big2", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
-	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
+	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big4", pos, size));
 
 
 	float resolution_x = GameModule::resources->GetIntParameter("resolution_x");
