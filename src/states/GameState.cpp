@@ -138,7 +138,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				NextPlayer();
 			}*/
 
-			if (players[i]->GetHasWon())
+			/*if (players[i]->GetHasWon())
 			{
 				std::cout << "Win!\n";
 				fade = true;
@@ -147,7 +147,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				//{
 					//obstacle->Destroy();
 				//}
-			}
+			}*/
 
 			if (!blockinput)
 			{
@@ -195,8 +195,24 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	auto it = entities.begin();
 	while (it != entities.end())
 	{
+		if ((*it)->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		{
+			auto winCondition = static_cast<Obstacle*>(it->get());
+			int winningPlayer = winCondition->GetWinningPlayerID();
+			std::cout << "Winner: Player: " << winningPlayer << "\n";
+			if (winningPlayer != -1)
+			{
+				fade = true;
+				winner_id = winningPlayer;
+				exit(0);
+			}
+
+			//exit(0);
+		}
+
 		if ((*it)->IsDestroyed())
 		{
+			
 			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
 				
@@ -439,7 +455,9 @@ void GameState::SpawnObstaclesGrid()
 
 	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
-
+	//auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
+	//obj->Init();
+	//entities.push_back(obj);
 
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
@@ -529,7 +547,7 @@ void GameState::InitGameplay()
 	
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
-		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i]);
+		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i], i);
 	}
 	activeplayerid = 0;
 	///NextPlayer(); //hack to init turntimer properly
@@ -566,9 +584,9 @@ void GameState::AddFloor()
 
 }
 
-void GameState::AddPlayer(glm::vec3 startpos, std::string name)
+void GameState::AddPlayer(glm::vec3 startpos, std::string name, int id)
 {
-	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities, name);
+	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities, name, id);
 	obj->Init();
 	players.push_back(obj);
 	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
