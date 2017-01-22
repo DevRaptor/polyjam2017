@@ -5,10 +5,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+int Ship::character = 0;
+
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
 	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 0.1f, 1.0f)), bullets(bullet_container), angle(0), isEnabled{ false }, hasWon{ false }
 {
+	currentcharacter = character++;
+
 	type = EntityType::SHIP;
 	mesh = GameModule::resources->GetMesh("player1");
 

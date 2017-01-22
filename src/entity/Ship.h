@@ -8,6 +8,9 @@
 class Ship : public Entity, public std::enable_shared_from_this<Ship>
 {
 public:
+	static int character; //0 - dziadek, babeczka, maska, pirat
+	int currentcharacter;
+
 	Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 		std::vector<std::shared_ptr<Entity>>& bullet_container);
 
