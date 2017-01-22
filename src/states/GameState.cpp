@@ -81,11 +81,13 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		FadeInEffect();
 	}
 
-
-	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+	static std::chrono::high_resolution_clock::time_point space_timer = std::chrono::high_resolution_clock::now();
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE) && (std::chrono::high_resolution_clock::now() > space_timer))
 	{
 		fade = false;
 		NextPlayer();
+
+		space_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
 	if (fade)
@@ -280,9 +282,9 @@ void GameState::NextPlayer()
 	if (players[activeplayerid]->currentcharacter == 0)
 		temp += "oldboy";
 	else if (players[activeplayerid]->currentcharacter == 1)
-		temp += "lady";
-	else if (players[activeplayerid]->currentcharacter == 2)
 		temp += "maskman";
+	else if (players[activeplayerid]->currentcharacter == 2)
+		temp += "lady";
 	else
 		temp += "pirate";
 
