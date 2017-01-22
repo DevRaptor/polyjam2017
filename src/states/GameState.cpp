@@ -369,16 +369,19 @@ void GameState::SpawnObstaclesGrid()
 
 	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
 	std::uniform_real_distribution<> random_position(-100, 100);
+	std::uniform_real_distribution<> random_win_spawn(0.0f, 0.6f);
 
 	glm::vec3 scale(1, 0.5, 1);
 	glm::vec3 biggerScale(1, 0.1, 1);
 
+	bool win_spawned = false;
+	int win_spawn_pos = std::floorf( random_win_spawn(GameModule::random_gen) * obstacles_amount_per_wall * obstacles_amount_per_wall *
+		((1.0f * no_spawn_chance )/ (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance)));
+	
 
 	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
-	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
-	obj->Init();
-	entities.push_back(obj);
+
 
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
@@ -424,8 +427,27 @@ void GameState::SpawnObstaclesGrid()
 					obj->Init();
 					entities.push_back(obj);
 				}
+				else
+				{
+					if (win_spawn_pos > 0)
+						--win_spawn_pos;
+					else if(!win_spawned)
+					{
+						auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, pos, scale, explosionRadius);
+						obj->Init();
+						entities.push_back(obj);
+						std::cout << "Win spawned at " << pos.x << " " << pos.z << "\n";
+						win_spawned = true;
+					}
+				}
+				
 			}
 		}
+	}
+
+	if (!win_spawned)
+	{
+		std::cout << "Raptot - zjebales \n";
 	}
 }
 
