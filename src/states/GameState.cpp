@@ -58,7 +58,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	}
 
 	if ((blockshooting && 
-		(DestructionsEnded() || GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))) ||
+		(DestructionsEnded() || GameModule::input->GetKeyState(SDL_SCANCODE_RSHIFT))) ||
 		(std::chrono::high_resolution_clock::now() > playertimer))
 	{	
 		FadeInEffect();
