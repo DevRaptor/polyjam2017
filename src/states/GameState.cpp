@@ -90,12 +90,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	else if (fadeout_coef < 1.0f)
 	{
 		fadeout_coef += fadeout_speed * delta;
-		ShowNextPlayer(false, 0);
+		ShowNextPlayer(false, activeplayerid);//(activeplayerid+1)%players.size());
 	}
 
 	if (fadeout_coef <= 0.0f)
 	{
-		ShowNextPlayer(true, 0);
+		ShowNextPlayer(true, activeplayerid);//(activeplayerid+1)%players.size());
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
@@ -598,6 +598,9 @@ void GameState::MainMenuGui()
 	glm::vec2 size(0.5, 0.5);
 
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big1", pos, size));
+	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big2", pos, size));
+	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
+	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
 }
 
 void GameState::ShowNextPlayer(bool show, int player_id)
