@@ -31,12 +31,12 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		if (number == 0)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light");
-			this->scale = glm::vec3(1, 0.01, 1);
+			this->scale = glm::vec3(1, 0.1, 1);
 		}
 		else if (number == 1)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_1");
-			this->scale = glm::vec3(1, 0.01, 1);
+			this->scale = glm::vec3(1, 0.1, 1);
 		}
 		else if (number == 2)
 		{
@@ -61,7 +61,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		else
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_explosive_1");
-			this->scale = glm::vec3(1, 0.01, 1);
+			this->scale = glm::vec3(1, 0.1, 1);
 		}
 
 	}

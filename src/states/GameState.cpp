@@ -90,23 +90,37 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	else if (fadeout_coef < 1.0f)
 	{
 		fadeout_coef += fadeout_speed * delta;
-		ShowNextPlayer(false, activeplayerid);//(activeplayerid+1)%players.size());
+		int id = activeplayerid;
+		/*std::cout << players[id]->GetIsEnabled() << "\n";
+		if (!(players[id]->GetIsEnabled()))
+		{
+			std::cout << id << "\n";
+			id = (id + 1) % players.size();
+		}*/
+		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
 
 	if (fadeout_coef <= 0.0f)
 	{
-		ShowNextPlayer(true, activeplayerid);//(activeplayerid+1)%players.size());
+		int id = activeplayerid;
+		/*std::cout << players[id]->GetIsEnabled() << "ufo\n";
+		while (!(players[id]->GetIsEnabled()))
+		{
+			std::cout << id << "\n";
+			id = (id + 1) % players.size();
+		}*/
+		ShowNextPlayer(true, id);//(activeplayerid+1)%players.size());
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
 	{
 		if (i == activeplayerid)
 		{
-			if (!players[i]->GetIsEnabled())
+			/*if (!players[i]->GetIsEnabled())
 			{
 				players[i]->SetIsEnabled(true);
 				NextPlayer();
-			}
+			}*/
 
 			if (players[i]->GetHasWon())
 			{
