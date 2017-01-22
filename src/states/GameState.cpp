@@ -30,6 +30,14 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 
 	dynamic_world->setGravity(btVector3(0, -10, 0));
 
+	GameModule::audio->AddSound("music1", "data/sounds/music1.wav");
+	GameModule::audio->AddSound("boom2", "data/sounds/boom2.wav");
+	GameModule::audio->AddSound("boom3", "data/sounds/boom3.wav");
+	GameModule::audio->AddSound("boom1", "data/sounds/boom1.wav");
+
+	GameModule::audio->SetVolumeMusic(100);
+	GameModule::audio->PlaySound("music1");
+
 	AddFloor();
 
 	InitGameplay();
@@ -392,6 +400,10 @@ void GameState::RestartGameplay()
 
 void GameState::Explosion(btVector3& pos, double radius)
 {
+	std::uniform_int_distribution<> random_sound(1, 3);
+	std::string sound_name = "boom" + std::to_string(random_sound(GameModule::random_gen));
+
+	GameModule::audio->PlaySound(sound_name);
 	for (int i = 0; i < GameModule::resources->GetIntParameter("particles_quantity"); i++)
 	{
 		std::uniform_real_distribution<> random(-5.0, 5.0);
