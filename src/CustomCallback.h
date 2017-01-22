@@ -22,21 +22,18 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 		
 		if (own_obj0->GetType() == EntityType::BULLET && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
-			std::cout << "detected\n";
 			//static_cast<Ship*>(own_obj0->GetOwner().get())->SetHasWon(true);
 			auto object = static_cast<Obstacle*>(own_obj1->GetOwner().get());
 			auto bullet = static_cast<Bullet*>(own_obj0->GetOwner().get());
-			std::cout << "PlayerID " << bullet->GetPlayerID() << "\n";
 			object->SetWinningPlayerID(bullet->GetPlayerID());
 			return 0;
 		}
 		else if (own_obj1->GetType() == EntityType::BULLET && own_obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
-			std::cout << "detected\n";
 			//static_cast<Ship*>(own_obj1->GetOwner().get())->SetHasWon(true);
 			auto object = static_cast<Obstacle*>(own_obj0->GetOwner().get());
 			auto bullet = static_cast<Bullet*>(own_obj1->GetOwner().get());
-			std::cout << "PlayerID " << bullet->GetPlayerID() << "\n";
+
 			object->SetWinningPlayerID(bullet->GetPlayerID());
 			return 0;
 		}
