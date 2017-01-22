@@ -45,7 +45,7 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->AddSound("oldboy1", "data/sounds/quotes/oldboy1.wav");
 	GameModule::audio->AddSound("pirate1", "data/sounds/quotes/pirate1.wav");
 
-	//GameModule::audio->PlaySound("music1");
+	GameModule::audio->PlaySound("music1");
 	GameModule::audio->SetVolumeChunk("wood1", 15);
 
 	AddFloor();
