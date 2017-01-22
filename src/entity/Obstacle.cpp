@@ -9,17 +9,50 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	if (type == EntityType::OBSTACLE_HEAVY)
 	{
 		points = 50;
-		mesh = GameModule::resources->GetMesh("obstacle_heavy");
+
+		std::uniform_int_distribution<int> random(0, 1);
+		int number = random(GameModule::random_gen);
+		if (number == 0)
+			mesh = GameModule::resources->GetMesh("obstacle_heavy");
+		else
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_heavy_1");
+			this->scale = glm::vec3(1.2, 0.1, 0.6);
+		}
 	}
 	else if (type == EntityType::OBSTACLE_LIGHT)
 	{
 		points = 10;
-		mesh = GameModule::resources->GetMesh("obstacle_light");
+
+		std::uniform_int_distribution<int> random(0, 3);
+		int number = random(GameModule::random_gen);
+		if (number == 0)
+			mesh = GameModule::resources->GetMesh("obstacle_light");
+		else if(number == 1)
+			mesh = GameModule::resources->GetMesh("obstacle_light_1");
+		else if (number == 2)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_2");
+			this->scale = glm::vec3(1.2, 0.1, 0.6);
+		}
+		else if (number == 3)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_3");
+			this->scale = glm::vec3(1.2, 0.1, 0.6);
+		}
 	}
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
 	{
 		points = 20;
-		mesh = GameModule::resources->GetMesh("obstacle_explosive");
+		//mesh = GameModule::resources->GetMesh("obstacle_explosive");
+
+		std::uniform_int_distribution<int> random(0, 1);
+		int number = random(GameModule::random_gen);
+		if (number == 0)
+			mesh = GameModule::resources->GetMesh("obstacle_explosive");
+		else
+			mesh = GameModule::resources->GetMesh("obstacle_explosive_1");
+
 	}
 	else if (type == EntityType::PARTICLE)
 	{
@@ -29,7 +62,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	else if (type == EntityType::EXPLOSION)
 	{
 		points = 0;
-		mesh = GameModule::resources->GetMesh("sphere");
+		//mesh = GameModule::resources->GetMesh("sphere");
 	}
 }
 
@@ -61,6 +94,7 @@ void Obstacle::Init()
 	
 	//to avoid render on start in world center
 	transform_mat = physic_body->GetTransformMatrix();
+	Rotate(glm::radians(90.0));
 }
 
 void Obstacle::Update()
@@ -70,7 +104,7 @@ void Obstacle::Update()
 	//static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
 	if (type == EntityType::EXPLOSION)
 	{
-		if(std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(100))
+		if(std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(00))
 			Destroy();
 		else
 		{
