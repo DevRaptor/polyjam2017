@@ -36,6 +36,11 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->AddSound("boom1", "data/sounds/boom1.wav");
 	GameModule::audio->AddSound("wood1", "data/sounds/destrWood.wav");
 
+	GameModule::audio->AddSound("lady0", "data/sounds/quotes/lady0.wav");
+	GameModule::audio->AddSound("maskman0", "data/sounds/quotes/maskman0.wav");
+	GameModule::audio->AddSound("oldboy0", "data/sounds/quotes/oldboy0.wav");
+	GameModule::audio->AddSound("pirate0", "data/sounds/quotes/pirate0.wav");
+
 	GameModule::audio->SetVolumeMusic(100);
 	GameModule::audio->PlaySound("music1");
 	GameModule::audio->SetVolumeChunk("wood1", 15);
@@ -76,11 +81,13 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		FadeInEffect();
 	}
 
-
-	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+	static std::chrono::high_resolution_clock::time_point space_timer = std::chrono::high_resolution_clock::now();
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE) && (std::chrono::high_resolution_clock::now() > space_timer))
 	{
 		fade = false;
 		NextPlayer();
+
+		space_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
 	if (fade)
@@ -287,6 +294,22 @@ void GameState::NextPlayer()
 	++activeplayerid;
 	activeplayerid %= players.size();
 
+	std::string temp = "";
+	if (players[activeplayerid]->currentcharacter == 0)
+		temp += "oldboy";
+	else if (players[activeplayerid]->currentcharacter == 1)
+		temp += "maskman";
+	else if (players[activeplayerid]->currentcharacter == 2)
+		temp += "lady";
+	else
+		temp += "pirate";
+
+	temp += std::to_string((rand() % GameModule::resources->GetIntParameter("quotes")));
+
+	std::cout << temp << "\n";
+
+	GameModule::audio->PlaySound(temp);
+
 	//fade out - probably another timer
 
 	ResetTurnTimer();
@@ -475,7 +498,7 @@ void GameState::SpawnObstaclesGrid()
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
-					if (obj->GetScale().x > 1.5)
+					if (obj->GetScale().x > 1.5) 
 						super_wide_spawned = true;
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
@@ -512,7 +535,7 @@ void GameState::SpawnObstaclesGrid()
 
 void GameState::InitGameplay()
 {
-	static const std::string playerNames[4] = { "player1", "player1" , "player1", "player1" };
+	static const std::string playerNames[4] = { "player1", "player2" , "player3", "player4" };
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	ResetDestructTimer();
