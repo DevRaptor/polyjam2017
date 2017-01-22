@@ -207,7 +207,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (players.size() > 0)
 	{
-		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
+		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 3, 0));
 		camera.Shake();
 		//camera.LookAt(players.front()->GetPosition());
 	}
@@ -433,8 +433,8 @@ void GameState::InitGameplay()
 	activeplayerid = -1;
 	NextPlayer(); //hack to init turntimer properly
 
-	SpawnObstaclesRand();
-	//SpawnObstaclesGrid();
+	//SpawnObstaclesRand();
+	SpawnObstaclesGrid();
 }
 
 
