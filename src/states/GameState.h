@@ -81,7 +81,7 @@ private:
 
 	void AddFloor();
 
-	void AddPlayer(glm::vec3 startpos);
+	void AddPlayer(glm::vec3 startpos, std::string name);
 
 	struct
 	{
