@@ -542,7 +542,7 @@ void GameState::Explosion(btVector3& pos, double radius)
 			random(GameModule::random_gen)));
 	}
 
-	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(radius, radius, radius), 0);
+	auto obj = std::make_shared<Obstacle>(EntityType::EXPLOSION, dynamic_world, glm::vec3(pos.getX(), pos.getY(), pos.getZ()), glm::vec3(radius, 0, radius), 0);
 	obj->Init();
 	entities.push_back(obj);
 }
