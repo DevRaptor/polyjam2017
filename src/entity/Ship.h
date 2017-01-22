@@ -24,6 +24,9 @@ public:
 
 	void SetIsEnabled(bool isTrue) { isEnabled = isTrue; }
 	bool GetIsEnabled() { return isEnabled; }
+
+	void SetHasWon(bool isTrue) { hasWon = isTrue; }
+	bool GetHasWon() { return hasWon; }
 protected:
 	float move_speed;
 	float move_speed_max;
@@ -35,6 +38,7 @@ protected:
 
 	float angle;
 	bool isEnabled;
+	bool hasWon;
 
 	std::chrono::milliseconds shoot_delay; //time to next shoot
 	std::chrono::high_resolution_clock::time_point shoot_timer;

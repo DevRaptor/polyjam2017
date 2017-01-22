@@ -7,7 +7,7 @@
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
 	std::vector<std::shared_ptr<Entity>>& bullet_container)
-	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container), angle(0), isEnabled{ false }
+	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 1.0f, 1.0f)), bullets(bullet_container), angle(0), isEnabled{ false }, hasWon{ false }
 {
 	type = EntityType::SHIP;
 	mesh = GameModule::resources->GetMesh("player1");

@@ -18,6 +18,28 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 
 		//bullet can collide only with meteor, so must add point
 		
+		if (own_obj0->GetType() == EntityType::SHIP && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		{
+			static_cast<Ship*>(own_obj0->GetOwner().get())->SetHasWon(true);
+			return 0;
+		}
+		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		{
+			static_cast<Ship*>(own_obj1->GetOwner().get())->SetHasWon(true);
+			return 0;
+		}
+
+		if (own_obj0->GetType() == EntityType::BULLET && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		{
+			own_obj0->GetOwner()->Destroy();
+			return 0;
+		}
+		else if (own_obj1->GetType() == EntityType::BULLET && own_obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		{
+			own_obj1->GetOwner()->Destroy();
+			return 0;
+		}
+
 		if (own_obj0->GetType() != EntityType::BULLET
 			&& own_obj1->GetType() != EntityType::BULLET)
 		{
@@ -36,6 +58,8 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 			own_obj0->GetOwner()->Destroy();
 			return 0;
 		}
+
+		
 
 		own_obj0->GetOwner()->Destroy();
 		own_obj1->GetOwner()->Destroy();

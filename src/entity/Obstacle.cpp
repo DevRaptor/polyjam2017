@@ -3,7 +3,7 @@
 Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale, double initWaveRadius)
 	: Entity(world_ptr, start_pos, scale, initWaveRadius), spawnTime{ std::chrono::high_resolution_clock::now() }
 {
-	
+	glm::vec3 biggerScale(1.2, 0.5, 0.6);
 	type = obj_type;
 
 	if (type == EntityType::OBSTACLE_HEAVY)
@@ -17,7 +17,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		else
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_heavy_1");
-			this->scale = glm::vec3(1.2, 0.1, 0.6);
+			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
 		}
 	}
 	else if (type == EntityType::OBSTACLE_LIGHT)
@@ -33,12 +33,12 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		else if (number == 2)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_2");
-			this->scale = glm::vec3(1.2, 0.1, 0.6);
+			this->scale = biggerScale;// glm::vec3(1.2, 0.1, 0.6);
 		}
 		else if (number == 3)
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_3");
-			this->scale = glm::vec3(1.2, 0.1, 0.6);
+			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
 		}
 	}
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)
@@ -64,6 +64,10 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		points = 0;
 		//mesh = GameModule::resources->GetMesh("sphere");
 	}
+	else if (type == EntityType::OBSTACLE_WIN_CONDITION)
+	{
+		mesh = GameModule::resources->GetMesh("particle");
+	}
 }
 
 void Obstacle::Init()
@@ -79,7 +83,7 @@ void Obstacle::Init()
 	{
 		physic_body->body->setCollisionFlags(physic_body->body->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
-	else if (type == EntityType::OBSTACLE_HEAVY)
+	else if (type == EntityType::OBSTACLE_HEAVY || type == EntityType::OBSTACLE_WIN_CONDITION)
 	{
 		physic_body->body->setLinearFactor(btVector3(0, 0, 0));
 	}
