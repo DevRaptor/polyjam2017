@@ -473,14 +473,15 @@ void GameState::SpawnObstaclesGrid()
 
 void GameState::InitGameplay()
 {
+	static const std::string playerNames[4] = { "player1", "player1" , "player1", "player1" };
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	ResetDestructTimer();
 	ResetTurnTimer();
-
+	
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
-		AddPlayer(glm::vec3(i * 15, 0, i * 15));
+		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i]);
 	}
 	activeplayerid = -1;
 	NextPlayer(); //hack to init turntimer properly
@@ -517,9 +518,9 @@ void GameState::AddFloor()
 
 }
 
-void GameState::AddPlayer(glm::vec3 startpos)
+void GameState::AddPlayer(glm::vec3 startpos, std::string name)
 {
-	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities);
+	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities, name);
 	obj->Init();
 	players.push_back(obj);
 	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
