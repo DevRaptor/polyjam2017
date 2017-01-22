@@ -40,8 +40,11 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->AddSound("maskman0", "data/sounds/quotes/maskman0.wav");
 	GameModule::audio->AddSound("oldboy0", "data/sounds/quotes/oldboy0.wav");
 	GameModule::audio->AddSound("pirate0", "data/sounds/quotes/pirate0.wav");
+	GameModule::audio->AddSound("lady1", "data/sounds/quotes/lady1.wav");
+	GameModule::audio->AddSound("maskman1", "data/sounds/quotes/maskman1.wav");
+	GameModule::audio->AddSound("oldboy1", "data/sounds/quotes/oldboy1.wav");
+	GameModule::audio->AddSound("pirate1", "data/sounds/quotes/pirate1.wav");
 
-	GameModule::audio->SetVolumeMusic(100);
 	GameModule::audio->PlaySound("music1");
 	GameModule::audio->SetVolumeChunk("wood1", 15);
 
@@ -308,13 +311,13 @@ void GameState::NextPlayer()
 
 	std::string temp = "";
 	if (players[activeplayerid]->currentcharacter == 0)
-		temp += "oldboy";
-	else if (players[activeplayerid]->currentcharacter == 1)
-		temp += "maskman";
-	else if (players[activeplayerid]->currentcharacter == 2)
-		temp += "lady";
-	else
 		temp += "pirate";
+	else if (players[activeplayerid]->currentcharacter == 1)
+		temp += "oldboy";
+	else if (players[activeplayerid]->currentcharacter == 2)
+		temp += "maskman";
+	else
+		temp += "lady";
 
 	temp += std::to_string((rand() % GameModule::resources->GetIntParameter("quotes")));
 
