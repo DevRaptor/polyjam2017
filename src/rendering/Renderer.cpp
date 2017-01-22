@@ -66,6 +66,21 @@ Renderer::Renderer(int resolution_x, int resolution_y)
 
 	mvp_gui_uniform = glGetUniformLocation(shader_gui->GetProgram(), "mvp");
 	transform_gui_uniform = glGetUniformLocation(shader_gui->GetProgram(), "transform");
+	
+	glm::mat4 proj = glm::perspective(glm::radians(45.0f), (float)800 / (float)600, 0.1f, 100.0f);
+	// Camera matrix
+	glm::mat4 View = glm::lookAt(
+		glm::vec3(0.01, 50, 0), // Camera is at (4,3,3), in World Space
+		glm::vec3(0, 0, 0), // and looks at the origin
+		glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+	);
+
+	// Model matrix : an identity matrix (model will be at the origin)
+	glm::mat4 Model = glm::mat4(1.0f);
+	// Our ModelViewProjection : multiplication of our 3 matrices
+	gui_mvp = proj * View * Model;
+
+
 }
 
 Renderer::~Renderer()
@@ -77,7 +92,7 @@ Renderer::~Renderer()
 void Renderer::Render(std::shared_ptr<GameState> game_state)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	
 	shader_program->UseProgram();
 
 	mvp = game_state->camera.GetMVP();
@@ -107,12 +122,19 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 
 
 	shader_gui->UseProgram();
-	glUniformMatrix4fv(mvp_gui_uniform, 1, GL_FALSE, &mvp[0][0]);
+
+	glUniformMatrix4fv(mvp_gui_uniform, 1, GL_FALSE, glm::value_ptr(gui_mvp));
 
 	for (auto ptr : game_state->gui)
 	{
 		glUniformMatrix4fv(transform_gui_uniform, 1, GL_FALSE, glm::value_ptr(ptr->GetTransform()));
 		ptr->Draw();
+	}
+
+	if (game_state->next_player)
+	{
+		glUniformMatrix4fv(transform_gui_uniform, 1, GL_FALSE, glm::value_ptr(game_state->next_player->GetTransform()));
+		game_state->next_player->Draw();
 	}
 
 	SDL_GL_SwapWindow(window);

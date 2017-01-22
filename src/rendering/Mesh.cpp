@@ -69,7 +69,7 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 
 Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 pos, glm::vec2 size)
 {
-	SetPosition(glm::vec3(pos.x, 0, pos.y));
+	SetPosition(glm::vec3(pos.x, 40, pos.y));
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
@@ -86,13 +86,13 @@ Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
 
 	vertex_amount = vertices.size();
-	/*
-	for (glm::vec3 vertex : vertices)
+	
+	for (glm::vec3& vertex : vertices)
 	{
-		vertex.x *= size.x / 2.0f;
-		vertex.z *= size.y / 2.0f;
+		vertex.x *= size.x;
+		vertex.z *= size.y;
 	}
-	*/
+	
 
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 
