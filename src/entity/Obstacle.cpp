@@ -21,6 +21,8 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 			mesh = GameModule::resources->GetMesh("obstacle_heavy_1");
 			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
 		}
+		this->scale.x = 1.5;
+		this->scale.z = 1.5;
 	}
 	else if (type == EntityType::OBSTACLE_LIGHT)
 	{
