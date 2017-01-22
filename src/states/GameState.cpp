@@ -36,6 +36,11 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->AddSound("boom1", "data/sounds/boom1.wav");
 	GameModule::audio->AddSound("wood1", "data/sounds/destrWood.wav");
 
+	GameModule::audio->AddSound("lady0", "data/sounds/quotes/lady0.wav");
+	GameModule::audio->AddSound("maskman0", "data/sounds/quotes/maskman0.wav");
+	GameModule::audio->AddSound("oldboy0", "data/sounds/quotes/oldboy0.wav");
+	GameModule::audio->AddSound("pirate0", "data/sounds/quotes/pirate0.wav");
+
 	GameModule::audio->SetVolumeMusic(100);
 	GameModule::audio->PlaySound("music1");
 	GameModule::audio->SetVolumeChunk("wood1", 15);
@@ -76,11 +81,13 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		FadeInEffect();
 	}
 
-
-	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+	static std::chrono::high_resolution_clock::time_point space_timer = std::chrono::high_resolution_clock::now();
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE) && (std::chrono::high_resolution_clock::now() > space_timer))
 	{
 		fade = false;
 		NextPlayer();
+
+		space_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
 	if (fade)
@@ -270,6 +277,22 @@ void GameState::NextPlayer()
 
 	++activeplayerid;
 	activeplayerid %= players.size();
+
+	std::string temp = "";
+	if (players[activeplayerid]->currentcharacter == 0)
+		temp += "oldboy";
+	else if (players[activeplayerid]->currentcharacter == 1)
+		temp += "maskman";
+	else if (players[activeplayerid]->currentcharacter == 2)
+		temp += "lady";
+	else
+		temp += "pirate";
+
+	temp += std::to_string((rand() % GameModule::resources->GetIntParameter("quotes")));
+
+	std::cout << temp << "\n";
+
+	GameModule::audio->PlaySound(temp);
 
 	//fade out - probably another timer
 

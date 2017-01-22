@@ -35,3 +35,4 @@ explosion_delay=100
 particles_quantity=8
 particlelifetime=3000
 explosion_radius=3
+quotes=2
