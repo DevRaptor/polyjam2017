@@ -257,7 +257,81 @@ bool GameState::DestructionsEnded()
 	return false;
 }
 
-void GameState::SpawnObstacles()
+void GameState::SpawnObstaclesRand()
+{
+	/*
+	x goes from 0 and below
+	don't touch y
+	z goes wherever you want
+	0,0,0 is player spawn - don't spawn here
+	*/
+	int obstacles_amount = GameModule::resources->GetIntParameter("obstacles_amount");
+
+	// How far from each side from any player obstacles can't spawn
+	float player_safe_space_size = 5;
+
+
+	float object_size = 3;
+
+	int light_spawn_chance = GameModule::resources->GetIntParameter("light_spawn_chance");
+	int heavy_spawn_chance = GameModule::resources->GetIntParameter("heavy_spawn_chance");
+	int expl_spawn_chance = GameModule::resources->GetIntParameter("expl_spawn_chance");
+
+	std::uniform_int_distribution<> random_spawner(0, (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
+	std::uniform_real_distribution<> random_position(-100, 100);
+
+	glm::vec3 scale(1, 1, 1);
+
+
+	static const double explosionRadius = 5;
+
+	for (int i = 0; i <= obstacles_amount; i++)
+	{
+		bool is_position_near_player = false;
+
+		float current_x = random_position(GameModule::random_gen);
+		float current_z = random_position(GameModule::random_gen);
+
+		for (std::size_t i = 0; i < players.size(); ++i)
+		{
+			glm::vec3 player_pos = players[i]->GetPosition();
+			if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
+				|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
+			{
+				is_position_near_player = true;
+				break;
+			}
+
+		}
+		if (!is_position_near_player)
+		{
+			glm::vec3 pos(current_x, 0, current_z);
+
+			int rand_obstacle_type = random_spawner(GameModule::random_gen);
+
+			if (rand_obstacle_type < expl_spawn_chance)
+			{
+				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
+				obj->Init();
+				entities.push_back(obj);
+			}
+			else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
+			{
+				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
+				obj->Init();
+				entities.push_back(obj);
+			}
+			else
+			{
+				auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
+				obj->Init();
+				entities.push_back(obj);
+			}
+		}
+	}
+}
+
+void GameState::SpawnObstaclesGrid()
 {
 	/*
 	x goes from 0 and below
@@ -279,59 +353,63 @@ void GameState::SpawnObstacles()
 	int expl_spawn_chance = GameModule::resources->GetIntParameter("expl_spawn_chance");
 
 	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
+	std::uniform_real_distribution<> random_position(-100, 100);
 
 	glm::vec3 scale(1, 1, 1);
 
 
 	static const double explosionRadius = 5;
+
+	
+
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
-		for (int j = 0; j <= obstacles_amount_per_wall; j++)
-		{
-			bool is_position_near_player = false;
+	for (int j = 0; j <= obstacles_amount_per_wall; j++)
+	{
+	bool is_position_near_player = false;
 
-			float current_x = -20 + i * object_size;
-			float current_z = -20 + j * object_size;
+	float current_x = -20 + i * object_size;
+	float current_z = -20 + j * object_size;
 
-			for (std::size_t i = 0; i < players.size(); ++i)
-			{
-				glm::vec3 player_pos = players[i]->GetPosition();
-				if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
-					|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
-				{
-					is_position_near_player = true;
-					break;
-				}
+	for (std::size_t i = 0; i < players.size(); ++i)
+	{
+	glm::vec3 player_pos = players[i]->GetPosition();
+	if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
+	|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
+	{
+	is_position_near_player = true;
+	break;
+	}
 
-			}
-			if (!is_position_near_player)
-			{
-				glm::vec3 pos(current_x, 0, current_z);
+	}
+	if (!is_position_near_player)
+	{
+	glm::vec3 pos(current_x, 0, current_z);
 
-				int rand_obstacle_type = random_spawner(GameModule::random_gen);
+	int rand_obstacle_type = random_spawner(GameModule::random_gen);
 
-				if (rand_obstacle_type < expl_spawn_chance)
-				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
-					obj->Init();
-					entities.push_back(obj);
-				}
-				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
-				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
-					obj->Init();
-					entities.push_back(obj);
-				}
-				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
-				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
-					obj->Init();
-					entities.push_back(obj);
-				}
+	if (rand_obstacle_type < expl_spawn_chance)
+	{
+	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
+	obj->Init();
+	entities.push_back(obj);
+	}
+	else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
+	{
+	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
+	obj->Init();
+	entities.push_back(obj);
+	}
+	else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
+	{
+	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
+	obj->Init();
+	entities.push_back(obj);
+	}
 
 
-			}
-		}
+	}
+	}
 	}
 }
 
@@ -349,7 +427,8 @@ void GameState::InitGameplay()
 	activeplayerid = -1;
 	NextPlayer(); //hack to init turntimer properly
 
-	SpawnObstacles();
+	SpawnObstaclesRand();
+	//SpawnObstaclesGrid();
 }
 
 
