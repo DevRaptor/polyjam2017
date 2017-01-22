@@ -74,7 +74,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	else if (type == EntityType::EXPLOSION)
 	{
 		points = 0;
-		mesh = GameModule::resources->GetMesh("wave");
+		mesh = GameModule::resources->GetMesh("sphere");
 	}
 	else if (type == EntityType::OBSTACLE_WIN_CONDITION)
 	{
