@@ -12,7 +12,7 @@ public:
 	int currentcharacter;
 
 	Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
-		std::vector<std::shared_ptr<Entity>>& bullet_container);
+		std::vector<std::shared_ptr<Entity>>& bullet_container, std::string name);
 
 	void Init() override;
 	void Update() override;

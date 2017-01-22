@@ -75,13 +75,13 @@ private:
 
 	std::shared_ptr<Mesh> next_player;
 
-
+	int winner_id = -1;
 
 	void MainMenuGui();
 
 	void AddFloor();
 
-	void AddPlayer(glm::vec3 startpos);
+	void AddPlayer(glm::vec3 startpos, std::string name);
 
 	struct
 	{
@@ -109,4 +109,6 @@ private:
 	void Explosion(btVector3& pos, double radius);
 
 	void ShowNextPlayer(bool show, int player_id);
+
+	void WinScreen();
 };

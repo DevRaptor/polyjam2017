@@ -81,6 +81,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		FadeInEffect();
 	}
 
+
 	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
 	{
 		fade = false;
@@ -91,30 +92,54 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		if(fadeout_coef > 0.0f)
 			fadeout_coef -= fadeout_speed * delta;
+
+		if (winner_id != -1)
+		{
+			WinScreen();
+
+			return;
+		}
 	}
 	else if (fadeout_coef < 1.0f)
 	{
 		fadeout_coef += fadeout_speed * delta;
-		ShowNextPlayer(false, activeplayerid);//(activeplayerid+1)%players.size());
+		int id = activeplayerid;
+		/*std::cout << players[id]->GetIsEnabled() << "\n";
+		if (!(players[id]->GetIsEnabled()))
+		{
+			std::cout << id << "\n";
+			id = (id + 1) % players.size();
+		}*/
+		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
 
 	if (fadeout_coef <= 0.0f)
 	{
-		ShowNextPlayer(true, activeplayerid);//(activeplayerid+1)%players.size());
+		int id = activeplayerid;
+		/*std::cout << players[id]->GetIsEnabled() << "ufo\n";
+		while (!(players[id]->GetIsEnabled()))
+		{
+			std::cout << id << "\n";
+			id = (id + 1) % players.size();
+		}*/
+		ShowNextPlayer(true, id);//(activeplayerid+1)%players.size());
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
 	{
 		if (i == activeplayerid)
 		{
-			if (!players[i]->GetIsEnabled())
+			/*if (!players[i]->GetIsEnabled())
 			{
 				players[i]->SetIsEnabled(true);
 				NextPlayer();
-			}
+			}*/
 
 			if (players[i]->GetHasWon())
 			{
+				std::cout << "Win!\n";
+				fade = true;
+				winner_id = i;
 				//for (auto& obstacle : entities)
 				//{
 					//obstacle->Destroy();
@@ -386,7 +411,7 @@ void GameState::SpawnObstaclesGrid()
 	float player_safe_space_size = 5;
 
 
-	float object_size = 3;
+	float object_size = 4;
 
 	int no_spawn_chance = GameModule::resources->GetIntParameter("no_spawn_chance");
 	int light_spawn_chance = GameModule::resources->GetIntParameter("light_spawn_chance");
@@ -400,6 +425,7 @@ void GameState::SpawnObstaclesGrid()
 	glm::vec3 scale(1, 0.5, 1);
 	glm::vec3 biggerScale(1, 0.1, 1);
 
+	bool super_wide_spawned = false;
 	bool win_spawned = false;
 	int win_spawn_pos = std::floorf( random_win_spawn(GameModule::random_gen) * obstacles_amount_per_wall * obstacles_amount_per_wall *
 		((1.0f * no_spawn_chance )/ (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance)));
@@ -413,10 +439,16 @@ void GameState::SpawnObstaclesGrid()
 	{
 		for (int j = 0; j <= obstacles_amount_per_wall; j++)
 		{
+			if (super_wide_spawned)
+			{
+				super_wide_spawned = false;
+				continue;
+			}
+			
 			bool is_position_near_player = false;
 
-			float current_x = -20 + i * object_size;
-			float current_z = -20 + j * object_size;
+			float current_x = -80 + i * object_size;
+			float current_z = -80 + j * object_size;
 
 			for (std::size_t i = 0; i < players.size(); ++i)
 			{
@@ -446,18 +478,22 @@ void GameState::SpawnObstaclesGrid()
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
+					if (obj->GetScale().x > 1.5)
+						super_wide_spawned = true;
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
 				{
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
+					if (obj->GetScale().x > 1.5)
+						super_wide_spawned = true;
 				}
 				else
 				{
 					if (win_spawn_pos > 0)
 						--win_spawn_pos;
-					else if(!win_spawned)
+					else if (!win_spawned)
 					{
 						auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, pos, scale, explosionRadius);
 						obj->Init();
@@ -466,7 +502,7 @@ void GameState::SpawnObstaclesGrid()
 						win_spawned = true;
 					}
 				}
-				
+			
 			}
 		}
 	}
@@ -479,14 +515,15 @@ void GameState::SpawnObstaclesGrid()
 
 void GameState::InitGameplay()
 {
+	static const std::string playerNames[4] = { "player1", "player1" , "player1", "player1" };
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	ResetDestructTimer();
 	ResetTurnTimer();
-
+	
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
-		AddPlayer(glm::vec3(i * 15, 0, i * 15));
+		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i]);
 	}
 	activeplayerid = -1;
 	NextPlayer(); //hack to init turntimer properly
@@ -523,9 +560,9 @@ void GameState::AddFloor()
 
 }
 
-void GameState::AddPlayer(glm::vec3 startpos)
+void GameState::AddPlayer(glm::vec3 startpos, std::string name)
 {
-	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities);
+	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities, name);
 	obj->Init();
 	players.push_back(obj);
 	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
@@ -636,4 +673,9 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 	{
 		next_player = nullptr;
 	}
+}
+
+void GameState::WinScreen()
+{
+	ShowNextPlayer(true, winner_id);
 }

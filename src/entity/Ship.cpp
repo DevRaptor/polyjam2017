@@ -8,13 +8,13 @@
 int Ship::character = 0;
 
 Ship::Ship(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos,
-	std::vector<std::shared_ptr<Entity>>& bullet_container)
+	std::vector<std::shared_ptr<Entity>>& bullet_container, std::string name)
 	: Entity(world_ptr, start_pos, glm::vec3(1.0f, 0.1f, 1.0f)), bullets(bullet_container), angle(0), isEnabled{ false }, hasWon{ false }
 {
 	currentcharacter = character++;
 
 	type = EntityType::SHIP;
-	mesh = GameModule::resources->GetMesh("player1");
+	mesh = GameModule::resources->GetMesh(/*"player1"*/ name);
 
 	points = 0;
 
@@ -185,8 +185,6 @@ void Ship::Shoot()
 
 	auto bullet = std::make_shared<Bullet>(world.lock(), pos, glm::vec3(0.3f, 0.3f, 0.3f), glm::vec2(direction[2], direction[0]));
 	bullet->Init();
-
-
 
 
 	bullets.push_back(bullet);
