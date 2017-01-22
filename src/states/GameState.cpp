@@ -35,9 +35,11 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->AddSound("boom2", "data/sounds/boom2.wav");
 	GameModule::audio->AddSound("boom3", "data/sounds/boom3.wav");
 	GameModule::audio->AddSound("boom1", "data/sounds/boom1.wav");
+	GameModule::audio->AddSound("wood1", "data/sounds/destrWood.wav");
 
 	GameModule::audio->SetVolumeMusic(100);
 	GameModule::audio->PlaySound("music1");
+	GameModule::audio->SetVolumeChunk("wood1", 15);
 
 	AddFloor();
 
@@ -159,6 +161,8 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			}
 			else
 			{
+				if((*it)->GetType() != EntityType::PARTICLE)
+					GameModule::audio->PlaySound("wood1");
 				players[activeplayerid]->points += (*it)->points;
 				it = entities.erase(it);
 			}
