@@ -79,6 +79,7 @@ private:
 
 	std::shared_ptr<Mesh> portrait = nullptr;
 
+	bool start = true;
 	int winner_id = -1;
 
 	void MainMenuGui();

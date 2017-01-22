@@ -48,7 +48,7 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	AddFloor();
 
 	MainMenuGui();
-
+	start = true;
 	InitGameplay();
 }
 
@@ -59,6 +59,17 @@ GameState::~GameState()
 
 void GameState::Update(std::chrono::milliseconds delta_time)
 {
+	if (start)
+	{
+		if (GameModule::input->GetKeyState(SDL_SCANCODE_Z))
+		{
+			start = false;
+			gui.clear();
+		}
+		else
+			return;
+	}
+	
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
@@ -698,7 +709,20 @@ void GameState::MainMenuGui()
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait2", pos, size));
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait1", pos, size));
 	
+	
 
+	pos.x = 0;
+	pos.y = 0;
+	size = glm::vec2(0.8, 1.05);
+
+	gui.push_back(std::make_shared<Mesh>("quad", "start", pos, size));
+	/*
+	
+	pos.x = 0;
+	pos.y = 0;
+	size = glm::vec2(1, 1.3);
+	gui.push_back(std::make_shared<Mesh>("quad", "start_background", pos, size));
+	*/
 }
 
 void GameState::ShowNextPlayer(bool show, int player_id)
@@ -719,5 +743,11 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 
 void GameState::WinScreen()
 {
-	ShowNextPlayer(true, winner_id);
+	glm::vec2 pos(0, 0);
+	glm::vec2 size(0.5, 0.5);
+
+	next_player = players_graphics[winner_id];
+
+
+	//ShowNextPlayer(true, winner_id);
 }
