@@ -27,10 +27,13 @@ protected:
 	SDL_GLContext context;
 
 	std::shared_ptr<ShaderProgram> shader_program;
+	std::shared_ptr<ShaderProgram> shader_gui;
 
 	glm::mat4 mvp;
 	GLuint transform_uniform;
+	GLuint transform_gui_uniform;
 	GLuint mvp_uniform;
+	GLuint mvp_gui_uniform;
 	GLuint fadeout_uniform;
 	GLfloat fadeout;
 };

@@ -18,6 +18,7 @@ class Mesh
 {
 public:
 	Mesh(const std::string& model_name, glm::vec3 pos = glm::vec3(0, 0, 0));
+	Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 pos, glm::vec2 size);
 	~Mesh();
 
 	void Draw();

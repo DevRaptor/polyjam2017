@@ -58,6 +58,14 @@ Renderer::Renderer(int resolution_x, int resolution_y)
 	mvp_uniform = glGetUniformLocation(shader_program->GetProgram(), "mvp");
 	transform_uniform = glGetUniformLocation(shader_program->GetProgram(), "transform");
 	fadeout_uniform = glGetUniformLocation(shader_program->GetProgram(), "fadeout");
+
+
+	shader_gui = std::make_shared<ShaderProgram>("data/shaders/gui.vert", "data/shaders/gui.frag");
+
+	shader_gui->UseProgram();
+
+	mvp_gui_uniform = glGetUniformLocation(shader_gui->GetProgram(), "mvp");
+	transform_gui_uniform = glGetUniformLocation(shader_gui->GetProgram(), "transform");
 }
 
 Renderer::~Renderer()
@@ -94,6 +102,16 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 	for (auto ptr : game_state->entities)
 	{
 		glUniformMatrix4fv(transform_uniform, 1, GL_FALSE, glm::value_ptr(ptr->transform_mat));
+		ptr->Draw();
+	}
+
+
+	shader_gui->UseProgram();
+	glUniformMatrix4fv(mvp_gui_uniform, 1, GL_FALSE, &mvp[0][0]);
+
+	for (auto ptr : game_state->gui)
+	{
+		glUniformMatrix4fv(transform_gui_uniform, 1, GL_FALSE, glm::value_ptr(ptr->GetTransform()));
 		ptr->Draw();
 	}
 

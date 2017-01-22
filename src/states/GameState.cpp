@@ -42,6 +42,8 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 
 	AddFloor();
 
+	MainMenuGui();
+
 	InitGameplay();
 }
 
@@ -550,3 +552,10 @@ void GameState::CheckTriggers()
 	}
 }
 
+void GameState::MainMenuGui()
+{
+	glm::vec2 pos(0, 0);
+	glm::vec2 size(100.0, 100.0);
+
+	gui.push_back(std::make_shared<Mesh>("quad", "texture", pos, size));
+}
