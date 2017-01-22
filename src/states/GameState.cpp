@@ -1,3 +1,4 @@
+#define GLM_FORCE_RADIANS
 #include "GameState.h"
 
 #include <iostream>
@@ -281,7 +282,8 @@ void GameState::SpawnObstacles()
 
 	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
 
-	glm::vec3 scale(1, 1, 1);
+	glm::vec3 scale(1, 0.1, 1);
+	glm::vec3 biggerScale(1, 0.1, 1);
 
 
 	static const double explosionRadius = 5;
@@ -319,8 +321,9 @@ void GameState::SpawnObstacles()
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
 				{
-					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, biggerScale, explosionRadius);
 					obj->Init();
+					obj->Rotate(glm::radians(90.0));
 					entities.push_back(obj);
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)

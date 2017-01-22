@@ -29,7 +29,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	else if (type == EntityType::EXPLOSION)
 	{
 		points = 0;
-		mesh = GameModule::resources->GetMesh("sphere");
+		//mesh = GameModule::resources->GetMesh("sphere");
 	}
 }
 
@@ -70,7 +70,7 @@ void Obstacle::Update()
 	//static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
 	if (type == EntityType::EXPLOSION)
 	{
-		if(std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(100))
+		if(std::chrono::high_resolution_clock::now() > spawnTime + std::chrono::milliseconds(00))
 			Destroy();
 		else
 		{
