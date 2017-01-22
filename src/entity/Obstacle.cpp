@@ -27,7 +27,10 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		std::uniform_int_distribution<int> random(0, 3);
 		int number = random(GameModule::random_gen);
 		if (number == 0)
+		{
 			mesh = GameModule::resources->GetMesh("obstacle_light");
+			this->scale = glm::vec3(1, 0.001, 1);
+		}
 		else if(number == 1)
 			mesh = GameModule::resources->GetMesh("obstacle_light_1");
 		else if (number == 2)
@@ -51,7 +54,10 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		if (number == 0)
 			mesh = GameModule::resources->GetMesh("obstacle_explosive");
 		else
+		{
 			mesh = GameModule::resources->GetMesh("obstacle_explosive_1");
+			this->scale = glm::vec3(1, 0.001, 1);
+		}
 
 	}
 	else if (type == EntityType::PARTICLE)
