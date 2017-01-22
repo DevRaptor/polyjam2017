@@ -12,7 +12,11 @@ public:
 	void Init() override;
 	void Update() override;
 
+	void SetWinningPlayerID(int id) { winningPlayerID = id; }
+	int GetWinningPlayerID() { return winningPlayerID; }
+
 private:
 	std::chrono::high_resolution_clock::time_point spawnTime;
+	int winningPlayerID;
 };
 

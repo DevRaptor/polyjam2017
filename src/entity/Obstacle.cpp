@@ -1,7 +1,7 @@
 #include "Obstacle.h"
 
 Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld> world_ptr, glm::vec3 start_pos, glm::vec3 scale, double initWaveRadius)
-	: Entity(world_ptr, start_pos, scale, initWaveRadius), spawnTime{ std::chrono::high_resolution_clock::now() }
+	: Entity(world_ptr, start_pos, scale, initWaveRadius), spawnTime{ std::chrono::high_resolution_clock::now() }, winningPlayerID{-1}
 {
 	glm::vec3 biggerScale(1.9, 0.5, 1);
 	type = obj_type;
@@ -80,8 +80,8 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	}
 	else if (type == EntityType::OBSTACLE_WIN_CONDITION)
 	{
-		//mesh = GameModule::resources->GetMesh("particle");
-		std::uniform_int_distribution<int> random(0, 3);
+		mesh = GameModule::resources->GetMesh("particle");
+		/*std::uniform_int_distribution<int> random(0, 3);
 		int number = random(GameModule::random_gen);
 		if (number == 0)
 		{
@@ -102,7 +102,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_3");
 			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
-		}
+		}*/
 	}
 }
 
