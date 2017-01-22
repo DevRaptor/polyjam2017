@@ -218,7 +218,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			{
 				fade = true;
 				winner_id = winningPlayer;
-				exit(0);
+				//exit(0);
 			}
 
 			//exit(0);
@@ -469,9 +469,9 @@ void GameState::SpawnObstaclesGrid()
 
 	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
-	//auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
-	//obj->Init();
-	//entities.push_back(obj);
+//	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
+//	obj->Init();
+//	entities.push_back(obj);
 
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
@@ -736,6 +736,14 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 
 		next_player = players_graphics[player_id];
 		portrait = nullptr;
+
+		if (winner_id != -1)
+		{
+			glm::vec2 pos(0, 0);
+			glm::vec2 size(0.8, 1.05);
+
+			gui.push_back(std::make_shared<Mesh>("quad", "win3", pos, size));
+		}
 	}
 	else
 	{
@@ -746,11 +754,8 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 
 void GameState::WinScreen()
 {
-	glm::vec2 pos(0, 0);
-	glm::vec2 size(0.5, 0.5);
+	//next_player = players_graphics[winner_id];
+//	gui.push_back(std::make_shared<Mesh>("quad", "win3", pos, size));
 
-	next_player = players_graphics[winner_id];
-
-
-	//ShowNextPlayer(true, winner_id);
+	ShowNextPlayer(true, winner_id);
 }
