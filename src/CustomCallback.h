@@ -21,13 +21,15 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 		if (own_obj0->GetType() == EntityType::SHIP && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
 			std::cout << "Game Won\n";
-			exit(0);
+			static_cast<Ship*>(own_obj0->GetOwner().get())->SetHasWon(true);
+			//exit(0);
 			return 0;
 		}
 		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
 			std::cout << "Game Won\n";
-			exit(0);
+			static_cast<Ship*>(own_obj1->GetOwner().get())->SetHasWon(true);
+			//exit(0);
 			return 0;
 		}
 

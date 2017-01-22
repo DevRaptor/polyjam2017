@@ -103,6 +103,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				NextPlayer();
 			}
 
+			if (players[i]->GetHasWon())
+			{
+				//for (auto& obstacle : entities)
+				//{
+					//obstacle->Destroy();
+				//}
+			}
+
 			if (!blockinput)
 			{
 				if (GameModule::input->IsLeftMouseButtonPressed() && !blockshooting)
