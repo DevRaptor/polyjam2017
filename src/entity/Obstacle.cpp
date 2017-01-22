@@ -10,26 +10,15 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	{
 		points = 50;
 
-		std::uniform_int_distribution<int> random(0, 2);
-		int number = random(GameModule::random_gen);
-		if (number <= 1)
-		{
-			mesh = GameModule::resources->GetMesh("obstacle_heavy");
-			this->scale.x = 1.45;
-			this->scale.z = 1.45 ;
-		}
-		else
-		{
-			mesh = GameModule::resources->GetMesh("obstacle_heavy_1");
-			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
-		}
-		//this->scale.z = 1.5;
+			mesh = GameModule::resources->GetMesh("wall");
+			this->scale.x = 1.6;
+			this->scale.z = 1.6;
 	}
 	else if (type == EntityType::OBSTACLE_LIGHT)
 	{
 		points = 10;
 
-		std::uniform_int_distribution<int> random(0, 5);
+		std::uniform_int_distribution<int> random(0, 8);
 		int number = random(GameModule::random_gen);
 		if (number < 2)
 		{
@@ -50,6 +39,15 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 		{
 			mesh = GameModule::resources->GetMesh("obstacle_light_3");
 			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
+		}
+		else if (number == 6)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_5");
+			this->scale = biggerScale;//glm::vec3(1.2, 0.1, 0.6);
+		}
+		else if (number > 6)
+		{
+			mesh = GameModule::resources->GetMesh("obstacle_light_4");
 		}
 	}
 	else if (type == EntityType::OBSTACLE_EXPLOSIVE)

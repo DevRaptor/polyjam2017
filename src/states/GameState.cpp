@@ -457,7 +457,7 @@ void GameState::SpawnObstaclesGrid()
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
-					if (obj->GetScale().x > 1.5)
+					if (obj->GetScale().x > 1.5) 
 						super_wide_spawned = true;
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
@@ -494,7 +494,7 @@ void GameState::SpawnObstaclesGrid()
 
 void GameState::InitGameplay()
 {
-	static const std::string playerNames[4] = { "player1", "player1" , "player1", "player1" };
+	static const std::string playerNames[4] = { "player1", "player2" , "player3", "player4" };
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	ResetDestructTimer();
