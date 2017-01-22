@@ -288,7 +288,7 @@ void GameState::SpawnObstaclesRand()
 	glm::vec3 scale(1, 1, 1);
 
 
-	static const double explosionRadius = 5;
+	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
 	for (int i = 0; i <= obstacles_amount; i++)
 	{
@@ -344,7 +344,7 @@ void GameState::SpawnObstaclesGrid()
 	z goes wherever you want
 	0,0,0 is player spawn - don't spawn here
 	*/
-	int obstacles_amount_per_wall = 30;
+	int obstacles_amount_per_wall = GameModule::resources->GetIntParameter("obstacles_amount");// 30;
 
 	// How far from each side from any player obstacles can't spawn
 	float player_safe_space_size = 5;
@@ -360,62 +360,62 @@ void GameState::SpawnObstaclesGrid()
 	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
 	std::uniform_real_distribution<> random_position(-100, 100);
 
-	glm::vec3 scale(1, 0.1, 1);
+	glm::vec3 scale(1, 0.5, 1);
 	glm::vec3 biggerScale(1, 0.1, 1);
 
 
-	static const double explosionRadius = 5;
+	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
-	
+	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
+	obj->Init();
+	entities.push_back(obj);
 
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
-	for (int j = 0; j <= obstacles_amount_per_wall; j++)
-	{
-	bool is_position_near_player = false;
+		for (int j = 0; j <= obstacles_amount_per_wall; j++)
+		{
+			bool is_position_near_player = false;
 
-	float current_x = -20 + i * object_size;
-	float current_z = -20 + j * object_size;
+			float current_x = -20 + i * object_size;
+			float current_z = -20 + j * object_size;
 
-	for (std::size_t i = 0; i < players.size(); ++i)
-	{
-	glm::vec3 player_pos = players[i]->GetPosition();
-	if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
-	|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
-	{
-	is_position_near_player = true;
-	break;
-	}
+			for (std::size_t i = 0; i < players.size(); ++i)
+			{
+				glm::vec3 player_pos = players[i]->GetPosition();
+				if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
+				|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
+				{
+					is_position_near_player = true;
+					break;
+				}
 
-	}
-	if (!is_position_near_player)
-	{
-	glm::vec3 pos(current_x, 0, current_z);
+			}
+			if (!is_position_near_player)
+			{
+				glm::vec3 pos(current_x, 0, current_z);
 
-	int rand_obstacle_type = random_spawner(GameModule::random_gen);
+				int rand_obstacle_type = random_spawner(GameModule::random_gen);
 
-	if (rand_obstacle_type < expl_spawn_chance)
-	{
-	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
-	obj->Init();
-	entities.push_back(obj);
-	}
-	else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
-	{
-	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
-	obj->Init();
-	entities.push_back(obj);
-	}
-	else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
-	{
-	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
-	obj->Init();
-	entities.push_back(obj);
-	}
-
-
-	}
-	}
+				if (rand_obstacle_type < expl_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_EXPLOSIVE, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
+				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
+				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_LIGHT, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
+			}
+		}
 	}
 }
 
@@ -531,6 +531,9 @@ void GameState::CheckTriggers()
 
 				const RigidBody* obj0 = static_cast<const RigidBody*>(obA);
 				const RigidBody* obj1 = static_cast<const RigidBody*>(obB);
+
+				if (obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION || obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+					continue;
 
 				if (obj0->GetType() == EntityType::EXPLOSION 
 					&& (obj1->GetType() == EntityType::OBSTACLE_HEAVY || obj1->GetType() == EntityType::OBSTACLE_EXPLOSIVE || obj1->GetType() == EntityType::OBSTACLE_LIGHT))
