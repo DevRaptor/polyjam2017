@@ -77,6 +77,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	}
 
 
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+	{
+		fade = false;
+		NextPlayer();
+	}
+
 	if (fade)
 	{
 		if(fadeout_coef > 0.0f)
@@ -92,32 +98,41 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	else if (fadeout_coef < 1.0f)
 	{
 		fadeout_coef += fadeout_speed * delta;
-		ShowNextPlayer(false, activeplayerid);//(activeplayerid+1)%players.size());
-	}
-
-	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
-	{
-		fade = false;
-		NextPlayer();
+		int id = activeplayerid;
+		/*std::cout << players[id]->GetIsEnabled() << "\n";
+		if (!(players[id]->GetIsEnabled()))
+		{
+			std::cout << id << "\n";
+			id = (id + 1) % players.size();
+		}*/
+		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
 
 	if (fadeout_coef <= 0.0f)
 	{
-		ShowNextPlayer(true, activeplayerid);//(activeplayerid+1)%players.size());
+		int id = activeplayerid;
+		/*std::cout << players[id]->GetIsEnabled() << "ufo\n";
+		while (!(players[id]->GetIsEnabled()))
+		{
+			std::cout << id << "\n";
+			id = (id + 1) % players.size();
+		}*/
+		ShowNextPlayer(true, id);//(activeplayerid+1)%players.size());
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
 	{
 		if (i == activeplayerid)
 		{
-			if (!players[i]->GetIsEnabled())
+			/*if (!players[i]->GetIsEnabled())
 			{
 				players[i]->SetIsEnabled(true);
 				NextPlayer();
-			}
+			}*/
 
 			if (players[i]->GetHasWon())
 			{
+				std::cout << "Win!\n";
 				fade = true;
 				winner_id = i;
 				//for (auto& obstacle : entities)
@@ -375,7 +390,7 @@ void GameState::SpawnObstaclesGrid()
 	float player_safe_space_size = 5;
 
 
-	float object_size = 3;
+	float object_size = 4;
 
 	int no_spawn_chance = GameModule::resources->GetIntParameter("no_spawn_chance");
 	int light_spawn_chance = GameModule::resources->GetIntParameter("light_spawn_chance");
@@ -404,8 +419,8 @@ void GameState::SpawnObstaclesGrid()
 		{
 			bool is_position_near_player = false;
 
-			float current_x = -20 + i * object_size;
-			float current_z = -20 + j * object_size;
+			float current_x = -80 + i * object_size;
+			float current_z = -80 + j * object_size;
 
 			for (std::size_t i = 0; i < players.size(); ++i)
 			{
