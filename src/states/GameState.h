@@ -75,7 +75,7 @@ private:
 
 	std::shared_ptr<Mesh> next_player;
 
-
+	int winner_id = -1;
 
 	void MainMenuGui();
 
@@ -109,4 +109,6 @@ private:
 	void Explosion(btVector3& pos, double radius);
 
 	void ShowNextPlayer(bool show, int player_id);
+
+	void WinScreen();
 };

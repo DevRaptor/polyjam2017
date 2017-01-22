@@ -76,21 +76,29 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		FadeInEffect();
 	}
 
-	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
-	{
-		fade = false;
-		NextPlayer();
-	}
 
 	if (fade)
 	{
 		if(fadeout_coef > 0.0f)
 			fadeout_coef -= fadeout_speed * delta;
+
+		if (winner_id != -1)
+		{
+			WinScreen();
+
+			return;
+		}
 	}
 	else if (fadeout_coef < 1.0f)
 	{
 		fadeout_coef += fadeout_speed * delta;
 		ShowNextPlayer(false, activeplayerid);//(activeplayerid+1)%players.size());
+	}
+
+	if (fade && GameModule::input->GetKeyState(SDL_SCANCODE_SPACE))
+	{
+		fade = false;
+		NextPlayer();
 	}
 
 	if (fadeout_coef <= 0.0f)
@@ -110,6 +118,8 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 			if (players[i]->GetHasWon())
 			{
+				fade = true;
+				winner_id = i;
 				//for (auto& obstacle : entities)
 				//{
 					//obstacle->Destroy();
@@ -615,4 +625,9 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 	{
 		next_player = nullptr;
 	}
+}
+
+void GameState::WinScreen()
+{
+	ShowNextPlayer(true, winner_id);
 }
