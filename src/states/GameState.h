@@ -68,6 +68,11 @@ private:
 	std::shared_ptr<btDefaultMotionState> groundMotionState;
 	std::shared_ptr<btRigidBody> groundRigidBody;
 
+	/* GUI */
+	std::vector<std::shared_ptr<Mesh>> gui;
+
+	void MainMenuGui();
+
 	void AddFloor();
 
 	void AddPlayer(glm::vec3 startpos);

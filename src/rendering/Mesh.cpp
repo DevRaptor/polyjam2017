@@ -66,6 +66,77 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 	
 }
 
+
+Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 pos, glm::vec2 size)
+{
+	SetPosition(glm::vec3(pos.x, 0, pos.y));
+
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec2> uvs;
+	std::vector<glm::vec3> normals;
+
+	if (!LoadOBJ("data/models/" + model_name + ".obj", vertices, uvs, normals))
+		return;
+
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
+	glGenBuffers(1, &vbo_vertex);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
+
+	vertex_amount = vertices.size();
+	/*
+	for (glm::vec3 vertex : vertices)
+	{
+		vertex.x *= size.x / 2.0f;
+		vertex.z *= size.y / 2.0f;
+	}
+	*/
+
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(0);
+
+	glGenBuffers(1, &vbo_uv);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_uv);
+
+	glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(glm::vec2), &uvs[0], GL_STATIC_DRAW);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(1);
+
+	glGenBuffers(1, &vbo_normal);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_normal);
+
+	glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glEnableVertexAttribArray(2);
+
+
+	//texture
+	int width, height, channels;
+	std::string name = "data/textures/" + texture + ".png";
+
+
+
+	SDL_Surface* surface;
+	surface = IMG_Load(name.c_str());
+	if (!surface)
+	{
+		Logger::Log("Error, graphic with name: ", name, " and path: ", name, " is not found\n");
+		SDL_FreeSurface(surface);
+	}
+
+	LoadTexture(surface);
+
+	//SDL_FreeSurface(surface);
+
+}
+
+
 Mesh::~Mesh()
 {
 	glDeleteBuffers(1, &vbo_vertex);
