@@ -1,8 +1,8 @@
 #include "Bullet.h"
 
 Bullet::Bullet(std::shared_ptr<btDiscreteDynamicsWorld> world_ptr,
-	glm::vec3 start_pos, glm::vec3 scale, glm::vec2 initVelocity)
-	: Entity(world_ptr, start_pos, scale), velocity(initVelocity)
+	glm::vec3 start_pos, glm::vec3 scale, glm::vec2 initVelocity, int initPlayerID)
+	: Entity(world_ptr, start_pos, scale), velocity(initVelocity), playerID{initPlayerID}
 {
 	type = EntityType::BULLET;
 	mesh = GameModule::resources->GetMesh("teapot");

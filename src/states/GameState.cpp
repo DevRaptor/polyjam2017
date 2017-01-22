@@ -112,6 +112,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << id << "\n";
 			id = (id + 1) % players.size();
 		}*/
+		std::cout << "id: " << id << "\n";
 		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
 
@@ -137,7 +138,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				NextPlayer();
 			}*/
 
-			if (players[i]->GetHasWon())
+			/*if (players[i]->GetHasWon())
 			{
 				std::cout << "Win!\n";
 				fade = true;
@@ -146,7 +147,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				//{
 					//obstacle->Destroy();
 				//}
-			}
+			}*/
 
 			if (!blockinput)
 			{
@@ -194,8 +195,24 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	auto it = entities.begin();
 	while (it != entities.end())
 	{
+		if ((*it)->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		{
+			auto winCondition = static_cast<Obstacle*>(it->get());
+			int winningPlayer = winCondition->GetWinningPlayerID();
+			std::cout << "Winner: Player: " << winningPlayer << "\n";
+			if (winningPlayer != -1)
+			{
+				fade = true;
+				winner_id = winningPlayer;
+				exit(0);
+			}
+
+			//exit(0);
+		}
+
 		if ((*it)->IsDestroyed())
 		{
+			
 			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
 				
@@ -300,6 +317,9 @@ void GameState::NextPlayer()
 
 	blockshooting = false;
 	blockinput = false;
+
+	//portrait
+
 }
 
 void GameState::ResetTurnTimer()
@@ -435,7 +455,9 @@ void GameState::SpawnObstaclesGrid()
 
 	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
-
+	//auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
+	//obj->Init();
+	//entities.push_back(obj);
 
 	for (int i = 0; i <= obstacles_amount_per_wall; i++)
 	{
@@ -480,7 +502,7 @@ void GameState::SpawnObstaclesGrid()
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
-					if (obj->GetScale().x > 1.5)
+					if (obj->GetScale().x > 1.5) 
 						super_wide_spawned = true;
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
@@ -517,7 +539,7 @@ void GameState::SpawnObstaclesGrid()
 
 void GameState::InitGameplay()
 {
-	static const std::string playerNames[4] = { "player1", "player1" , "player1", "player1" };
+	static const std::string playerNames[4] = { "player4", "player1" , "player2", "player3" };
 	obstacle_data.delay = std::chrono::milliseconds(obstacle_data.default_delay);
 
 	ResetDestructTimer();
@@ -525,10 +547,10 @@ void GameState::InitGameplay()
 	
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
-		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i]);
+		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i], i);
 	}
-	activeplayerid = -1;
-	NextPlayer(); //hack to init turntimer properly
+	activeplayerid = 0;
+	///NextPlayer(); //hack to init turntimer properly
 
 	//SpawnObstaclesRand();
 	SpawnObstaclesGrid();
@@ -562,9 +584,9 @@ void GameState::AddFloor()
 
 }
 
-void GameState::AddPlayer(glm::vec3 startpos, std::string name)
+void GameState::AddPlayer(glm::vec3 startpos, std::string name, int id)
 {
-	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities, name);
+	auto obj = std::make_shared<Ship>(dynamic_world, startpos, entities, name, id);
 	obj->Init();
 	players.push_back(obj);
 	camera.Translate(players.front()->GetPosition() + glm::vec3(0, 10, 0));
@@ -660,7 +682,23 @@ void GameState::MainMenuGui()
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big1", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big2", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
-	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big3", pos, size));
+	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big4", pos, size));
+
+
+	float resolution_x = GameModule::resources->GetIntParameter("resolution_x");
+	float resolution_y = GameModule::resources->GetIntParameter("resolution_y");
+
+	pos.x = /*resolution_x/2.0f -*/ 3; //pion!
+	pos.y = /*resolution_y/2.0f -*/ -3; //poziom
+
+	size = glm::vec2(0.2, 0.2);
+
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait3", pos, size));
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait", pos, size));
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait2", pos, size));
+	portraits.push_back(std::make_shared<Mesh>("quad", "portrait1", pos, size));
+	
+
 }
 
 void GameState::ShowNextPlayer(bool show, int player_id)
@@ -670,10 +708,12 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 		//must add player_id
 
 		next_player = players_graphics[player_id];
+		portrait = nullptr;
 	}
 	else
 	{
 		next_player = nullptr;
+		portrait = portraits[player_id];
 	}
 }
 

@@ -6,6 +6,8 @@
 
 #include "entity/PhysicBody.h"
 #include "entity/Ship.h"
+#include "entity/Obstacle.h"
+#include "entity/Bullet.h"
 
 struct CustomCallback : public btCollisionWorld::ContactResultCallback 
 {
@@ -18,14 +20,24 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 
 		//bullet can collide only with meteor, so must add point
 		
-		if (own_obj0->GetType() == EntityType::SHIP && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		if (own_obj0->GetType() == EntityType::BULLET && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
-			static_cast<Ship*>(own_obj0->GetOwner().get())->SetHasWon(true);
+			std::cout << "detected\n";
+			//static_cast<Ship*>(own_obj0->GetOwner().get())->SetHasWon(true);
+			auto object = static_cast<Obstacle*>(own_obj1->GetOwner().get());
+			auto bullet = static_cast<Bullet*>(own_obj0->GetOwner().get());
+			std::cout << "PlayerID " << bullet->GetPlayerID() << "\n";
+			object->SetWinningPlayerID(bullet->GetPlayerID());
 			return 0;
 		}
-		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		else if (own_obj1->GetType() == EntityType::BULLET && own_obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
-			static_cast<Ship*>(own_obj1->GetOwner().get())->SetHasWon(true);
+			std::cout << "detected\n";
+			//static_cast<Ship*>(own_obj1->GetOwner().get())->SetHasWon(true);
+			auto object = static_cast<Obstacle*>(own_obj0->GetOwner().get());
+			auto bullet = static_cast<Bullet*>(own_obj1->GetOwner().get());
+			std::cout << "PlayerID " << bullet->GetPlayerID() << "\n";
+			object->SetWinningPlayerID(bullet->GetPlayerID());
 			return 0;
 		}
 

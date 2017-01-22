@@ -137,5 +137,11 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 		game_state->next_player->Draw();
 	}
 
+	if (game_state->portrait)
+	{
+		glUniformMatrix4fv(transform_gui_uniform, 1, GL_FALSE, glm::value_ptr(game_state->portrait->GetTransform()));
+		game_state->portrait->Draw();
+	}
+
 	SDL_GL_SwapWindow(window);
 }
