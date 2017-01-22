@@ -1,4 +1,3 @@
-#define GLM_FORCE_RADIANS
 #include "GameState.h"
 
 #include <iostream>
@@ -91,6 +90,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	else if (fadeout_coef < 1.0f)
 	{
 		fadeout_coef += fadeout_speed * delta;
+		ShowNextPlayer(false, 0);
+	}
+
+	if (fadeout_coef <= 0.0f)
+	{
+		ShowNextPlayer(true, 0);
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
@@ -185,14 +190,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		Explosion(pos.first, pos.second);
 	}
 
-	/*static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
+	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_R)
 		&& (std::chrono::high_resolution_clock::now() > restart_timer))
 	{
 		RestartGameplay();
 
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
-	}*/
+	}
 
 	static std::chrono::high_resolution_clock::time_point points_timer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_P)
@@ -209,7 +214,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (players.size() > 0)
 	{
-		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 5, 0));
+		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		camera.Shake();
 		//camera.LookAt(players.front()->GetPosition());
 	}
@@ -362,8 +367,7 @@ void GameState::SpawnObstaclesGrid()
 	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
 	std::uniform_real_distribution<> random_position(-100, 100);
 
-	glm::vec3 scale(1, 0.1, 1);
-	glm::vec3 biggerScale(1, 0.1, 1);
+	glm::vec3 scale(1, 1, 1);
 
 
 	static const double explosionRadius = 5;
@@ -557,7 +561,21 @@ void GameState::CheckTriggers()
 void GameState::MainMenuGui()
 {
 	glm::vec2 pos(0, 0);
-	glm::vec2 size(100.0, 100.0);
+	glm::vec2 size(0.5, 0.5);
 
-	gui.push_back(std::make_shared<Mesh>("quad", "texture", pos, size));
+	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big1", pos, size));
+}
+
+void GameState::ShowNextPlayer(bool show, int player_id)
+{
+	if (show)
+	{
+		//must add player_id
+
+		next_player = players_graphics[player_id];
+	}
+	else
+	{
+		next_player = nullptr;
+	}
 }

@@ -30,6 +30,7 @@ protected:
 	std::shared_ptr<ShaderProgram> shader_gui;
 
 	glm::mat4 mvp;
+	glm::mat4 gui_mvp;
 	GLuint transform_uniform;
 	GLuint transform_gui_uniform;
 	GLuint mvp_uniform;

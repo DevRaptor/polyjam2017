@@ -71,6 +71,12 @@ private:
 	/* GUI */
 	std::vector<std::shared_ptr<Mesh>> gui;
 
+	std::vector<std::shared_ptr<Mesh>> players_graphics;
+
+	std::shared_ptr<Mesh> next_player;
+
+
+
 	void MainMenuGui();
 
 	void AddFloor();
@@ -101,4 +107,6 @@ private:
 	void RestartGameplay();
 
 	void Explosion(btVector3& pos, double radius);
+
+	void ShowNextPlayer(bool show, int player_id);
 };
