@@ -183,14 +183,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		Explosion(pos.first, pos.second);
 	}
 
-	static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
+	/*static std::chrono::high_resolution_clock::time_point restart_timer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_R)
 		&& (std::chrono::high_resolution_clock::now() > restart_timer))
 	{
 		RestartGameplay();
 
 		restart_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
-	}
+	}*/
 
 	static std::chrono::high_resolution_clock::time_point points_timer = std::chrono::high_resolution_clock::now();
 	if (GameModule::input->GetKeyState(SDL_SCANCODE_P)
@@ -207,7 +207,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (players.size() > 0)
 	{
-		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 3, 0));
+		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 5, 0));
 		camera.Shake();
 		//camera.LookAt(players.front()->GetPosition());
 	}
