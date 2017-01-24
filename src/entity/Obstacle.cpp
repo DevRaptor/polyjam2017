@@ -105,7 +105,18 @@ void Obstacle::Init()
 		physic_body->body->setLinearFactor(btVector3(1, 0, 1));
 	}
 	
-	physic_body->body->setAngularFactor(btVector3(0, 0, 0));
+	if (GameModule::resources->GetBoolParameter("obstaclerotation"))
+	{
+		if (type != EntityType::OBSTACLE_HEAVY)
+			physic_body->body->setAngularFactor(btVector3(0, 1, 0));
+		else
+			physic_body->body->setAngularFactor(btVector3(0, 0, 0));
+	}
+	else
+	{
+		physic_body->body->setAngularFactor(btVector3(0, 0, 0));
+	}
+
 	physic_body->body->activate(true);
 	
 	//to avoid render on start in world center
