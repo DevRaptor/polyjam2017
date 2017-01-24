@@ -86,7 +86,6 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	dynamic_world->stepSimulation(delta, 10);
 
 	//TURNSYSTEM - stateslike
-
 	if (players[activeplayerid]->AlreadyShot())
 	{
 		if (!blockshooting)
@@ -94,7 +93,6 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			blockshooting = true;
 			ResetDestructTimer();
 		}
-		//camera change to show destructions
 	}
 
 	if ((blockshooting &&
@@ -311,7 +309,6 @@ void GameState::FadeInEffect()
 
 void GameState::NextPlayer()
 {
-
 	if (activeplayerid != -1) //first iteration AccessViolation exception
 		players[activeplayerid]->QuitShooting();
 
@@ -330,19 +327,12 @@ void GameState::NextPlayer()
 
 	temp += std::to_string((rand() % GameModule::resources->GetIntParameter("quotes")));
 
-	std::cout << temp << "\n";
-
 	GameModule::audio->PlaySound(temp);
-
-	//fade out - probably another timer
 
 	ResetTurnTimer();
 
 	blockshooting = false;
 	blockinput = false;
-
-	//portrait
-
 }
 
 void GameState::ResetTurnTimer()
