@@ -113,6 +113,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (fade)
 	{
+		gameplay = false;
 		if (fadeout_coef > 0.0f)
 			fadeout_coef -= fadeout_speed * delta;
 
@@ -136,6 +137,10 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		//std::cout << "id: " << id << "\n";
 		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
+	else
+	{
+		gameplay = true;
+	}
 
 	if (fadeout_coef <= 0.0f)
 	{
@@ -147,6 +152,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			id = (id + 1) % players.size();
 		}*/
 		ShowNextPlayer(true, id);//(activeplayerid+1)%players.size());
+		
 	}
 
 	for (std::size_t i = 0; i < players.size(); ++i)
@@ -689,8 +695,15 @@ void GameState::CheckTriggers()
 
 void GameState::MainMenuGui()
 {
+
+	float resolution_x = GameModule::resources->GetIntParameter("resolution_x");
+	float resolution_y = GameModule::resources->GetIntParameter("resolution_y");
+
+
+	res_ratio = resolution_x / resolution_y;
+	
 	glm::vec2 pos(0, 0);
-	glm::vec2 size(0.5, 0.5);
+	glm::vec2 size(0.5, 0.5 * res_ratio);
 
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big1", pos, size));
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big2", pos, size));
@@ -698,13 +711,15 @@ void GameState::MainMenuGui()
 	players_graphics.push_back(std::make_shared<Mesh>("quad", "player_big4", pos, size));
 
 
-	float resolution_x = GameModule::resources->GetIntParameter("resolution_x");
-	float resolution_y = GameModule::resources->GetIntParameter("resolution_y");
 
-	pos.x = /*resolution_x/2.0f -*/ 3; //pion!
-	pos.y = /*resolution_y/2.0f -*/ -3; //poziom
+	pos.x = 0.8f;
+	pos.y = -0.5f;
 
-	size = glm::vec2(0.2, 0.2);
+	size = glm::vec2(0.2, 0.2 * res_ratio);
+
+	//frame = std::make_shared<Mesh>("quad", "frame", pos, size);
+
+	frame = std::make_shared<Mesh>("quad", "frame", pos, size);
 
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait3", pos, size));
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait", pos, size));
@@ -715,7 +730,7 @@ void GameState::MainMenuGui()
 
 	pos.x = 0;
 	pos.y = 0;
-	size = glm::vec2(0.8, 1.05);
+	size = glm::vec2(1, 1);
 
 	gui.push_back(std::make_shared<Mesh>("quad", "start", pos, size));
 	/*
@@ -735,6 +750,7 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 
 		next_player = players_graphics[player_id];
 		portrait = nullptr;
+		
 
 		if (winner_id != -1)
 		{
@@ -747,7 +763,8 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 	else
 	{
 		next_player = nullptr;
-		portrait = portraits[player_id];
+		portrait = portraits[player_id];	
+		
 	}
 }
 

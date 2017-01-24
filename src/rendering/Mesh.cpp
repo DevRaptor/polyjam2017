@@ -12,7 +12,35 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	if (!LoadOBJ("data/models/"+model_name+".obj", vertices, uvs, normals))
+	if (model_name == "quad")
+	{
+		vertices.push_back(glm::vec3(0, 0, 0));
+		vertices.push_back(glm::vec3(1, 0, 0));
+		vertices.push_back(glm::vec3(0, 1, 0));
+		vertices.push_back(glm::vec3(0, 1, 0));
+		vertices.push_back(glm::vec3(1, 0, 0));
+		vertices.push_back(glm::vec3(1, 1, 0));
+		/*
+		float quad_verts[18] = { 0, 0, 0, 1, 0, 0, 
+			0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0 };
+
+		float texcoords[12] =
+		{
+			0, 0, 1, 0, 0, 1,
+			0, 1, 1, 0, 1, 1
+		};*/
+
+		uvs.push_back(glm::vec2(0, 0));
+		uvs.push_back(glm::vec2(1, 0));
+		uvs.push_back(glm::vec2(0, 1));
+		uvs.push_back(glm::vec2(0, 1));
+		uvs.push_back(glm::vec2(1, 0));
+		uvs.push_back(glm::vec2(1, 1));
+
+
+
+	}
+	else if (!LoadOBJ("data/models/"+model_name+".obj", vertices, uvs, normals))
 		return;
 
 
@@ -69,13 +97,38 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 
 Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 pos, glm::vec2 size)
 {
-	SetPosition(glm::vec3(pos.x, 40, pos.y));
+	SetPosition(glm::vec3(pos.x, pos.y, 0));
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 
-	if (!LoadOBJ("data/models/" + model_name + ".obj", vertices, uvs, normals))
+	if (model_name == "quad")
+	{
+		vertices.push_back(glm::vec3(-1, -1, 0));
+		vertices.push_back(glm::vec3(1, -1, 0));
+		vertices.push_back(glm::vec3(-1, 1, 0));
+		vertices.push_back(glm::vec3(-1, 1, 0));
+		vertices.push_back(glm::vec3(1, -1, 0));
+		vertices.push_back(glm::vec3(1, 1, 0));
+		/*
+		float quad_verts[18] = { 0, 0, 0, 1, 0, 0,
+		0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 1, 0 };
+
+		float texcoords[12] =
+		{
+		0, 0, 1, 0, 0, 1,
+		0, 1, 1, 0, 1, 1
+		};*/
+
+		uvs.push_back(glm::vec2(0, 1));
+		uvs.push_back(glm::vec2(1, 1));
+		uvs.push_back(glm::vec2(0, 0));
+		uvs.push_back(glm::vec2(0, 0));
+		uvs.push_back(glm::vec2(1, 1));
+		uvs.push_back(glm::vec2(1, 0));
+	}
+	else if (!LoadOBJ("data/models/" + model_name + ".obj", vertices, uvs, normals))
 		return;
 
 
@@ -90,7 +143,7 @@ Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 
 	for (glm::vec3& vertex : vertices)
 	{
 		vertex.x *= size.x;
-		vertex.z *= size.y;
+		vertex.y *= size.y;
 	}
 	
 

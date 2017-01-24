@@ -34,7 +34,6 @@ protected:
 	GLuint transform_uniform;
 	GLuint transform_gui_uniform;
 	GLuint mvp_uniform;
-	GLuint mvp_gui_uniform;
 	GLuint fadeout_uniform;
 	GLfloat fadeout;
 };

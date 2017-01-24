@@ -76,8 +76,12 @@ private:
 	std::shared_ptr<Mesh> next_player;
 
 	std::vector<std::shared_ptr<Mesh>> portraits;
+	std::shared_ptr<Mesh> frame;
+	bool gameplay = false;
 
 	std::shared_ptr<Mesh> portrait = nullptr;
+
+	float res_ratio;
 
 	bool start = true;
 	int winner_id = -1;
