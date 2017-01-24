@@ -17,6 +17,11 @@ public:
 	void Shake();
 	void StartShaking();
 
+	glm::vec3 GetPosition()
+	{
+		return this->position;
+	}
+
 private:
 	glm::mat4 projection;
 

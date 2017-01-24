@@ -54,7 +54,7 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->SetVolumeMusic(50);
 
 	GameModule::audio->PlayMusic("ambient", 1000, 1, 1);
-	
+
 	AddFloor();
 
 	MainMenuGui();
@@ -294,6 +294,10 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	{
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		camera.Shake();
+
+		//std::cout << "PL: " << players[activeplayerid]->GetPosition().x << " " << players[activeplayerid]->GetPosition().y << " " << players[activeplayerid]->GetPosition().z << "\n";
+		//std::cout << "CAM: " << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z << "\n";
+
 		//camera.LookAt(players.front()->GetPosition());
 	}
 
@@ -558,10 +562,18 @@ void GameState::InitGameplay()
 	ResetDestructTimer();
 	ResetTurnTimer();
 
+	int object_size = 3; //lel - from lifes
+
+	int limit = object_size * GameModule::resources->GetIntParameter("obstacles_amount") - 20;
+
+	limit /= 2;
+
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
-		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i], i);
+		AddPlayer(glm::vec3((i * limit) % (limit * 2), 0, ((i*limit)/(limit*2)) * limit), playerNames[i], i);
+		std::cout << i << ": " << (i * limit) % (limit * 2) << " " << ((i*limit) / (limit * 2)) * limit << "\n";
 	}
+
 	activeplayerid = 0;
 	///NextPlayer(); //hack to init turntimer properly
 
