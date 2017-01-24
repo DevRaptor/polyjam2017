@@ -30,12 +30,16 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 
 	dynamic_world->setGravity(btVector3(0, -10, 0));
 
-	GameModule::audio->AddSound("music1", "data/sounds/music1.wav");
+	//music
+	GameModule::audio->AddMusic("ambient", "data/sounds/music1.ogg");
+
+	//effects
 	GameModule::audio->AddSound("boom2", "data/sounds/boom2.wav");
 	GameModule::audio->AddSound("boom3", "data/sounds/boom3.wav");
 	GameModule::audio->AddSound("boom1", "data/sounds/boom1.wav");
 	GameModule::audio->AddSound("wood1", "data/sounds/destrWood.wav");
 
+	//quotes
 	GameModule::audio->AddSound("lady0", "data/sounds/quotes/lady0.wav");
 	GameModule::audio->AddSound("maskman0", "data/sounds/quotes/maskman0.wav");
 	GameModule::audio->AddSound("oldboy0", "data/sounds/quotes/oldboy0.wav");
@@ -45,11 +49,12 @@ GameState::GameState() : camera{ 90, 0.1, 100 }
 	GameModule::audio->AddSound("oldboy1", "data/sounds/quotes/oldboy1.wav");
 	GameModule::audio->AddSound("pirate1", "data/sounds/quotes/pirate1.wav");
 
-	GameModule::audio->SetVolumeChunk("music1", 50);
-	int temp = GameModule::audio->PlaySound("music1");
+	//volume
 	GameModule::audio->SetVolumeChunk("wood1", 15);
+	GameModule::audio->SetVolumeMusic(50);
 
-
+	GameModule::audio->PlayMusic("ambient", 1000, 1, 1);
+	
 	AddFloor();
 
 	MainMenuGui();
@@ -64,6 +69,8 @@ GameState::~GameState()
 
 void GameState::Update(std::chrono::milliseconds delta_time)
 {
+	GameModule::audio->Update();
+
 	if (start)
 	{
 		if (GameModule::input->GetKeyState(SDL_SCANCODE_Z))
@@ -74,12 +81,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		else
 			return;
 	}
-	
+
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
 	//TURNSYSTEM - stateslike
-	
+
 	if (players[activeplayerid]->AlreadyShot())
 	{
 		if (!blockshooting)
@@ -90,10 +97,10 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		//camera change to show destructions
 	}
 
-	if ((blockshooting && 
+	if ((blockshooting &&
 		(DestructionsEnded() || GameModule::input->GetKeyState(SDL_SCANCODE_RSHIFT))) ||
 		(std::chrono::high_resolution_clock::now() > playertimer))
-	{	
+	{
 		FadeInEffect();
 	}
 
@@ -108,7 +115,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	if (fade)
 	{
-		if(fadeout_coef > 0.0f)
+		if (fadeout_coef > 0.0f)
 			fadeout_coef -= fadeout_speed * delta;
 
 		if (winner_id != -1)
@@ -128,7 +135,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << id << "\n";
 			id = (id + 1) % players.size();
 		}*/
-		std::cout << "id: " << id << "\n";
+		//std::cout << "id: " << id << "\n";
 		ShowNextPlayer(false, id);//(activeplayerid+1)%players.size());
 	}
 
@@ -215,7 +222,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		{
 			auto winCondition = static_cast<Obstacle*>(it->get());
 			int winningPlayer = winCondition->GetWinningPlayerID();
-			std::cout << "Winner: Player: " << winningPlayer << "\n";
+			//std::cout << "Winner: Player: " << winningPlayer << "\n";
 			if (winningPlayer != -1)
 			{
 				fade = true;
@@ -228,10 +235,10 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 		if ((*it)->IsDestroyed())
 		{
-			
+
 			if ((*it)->GetType() == EntityType::OBSTACLE_EXPLOSIVE)
 			{
-				
+
 				if (std::chrono::high_resolution_clock::now() > (*it)->GetTimeOfDeath() + std::chrono::milliseconds(GameModule::resources->GetIntParameter("explosion_delay")))
 				{
 					explosion_positions.push_back({ (*it)->GetPhysicPosition(), (*it)->GetWaveRadius() });
@@ -241,7 +248,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			}
 			else
 			{
-				if((*it)->GetType() != EntityType::PARTICLE)
+				if ((*it)->GetType() != EntityType::PARTICLE)
 					GameModule::audio->PlaySound("wood1");
 				players[activeplayerid]->points += (*it)->points;
 				it = entities.erase(it);
@@ -277,7 +284,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		&& (std::chrono::high_resolution_clock::now() > points_timer))
 	{
 		std::cout << "=====Scoreboard======\n";
-		for(int i = 0; i < players.size(); i++)
+		for (int i = 0; i < players.size(); i++)
 		{
 			std::cout << "player " << i << " has: " << players[i]->points << "\n";
 		}
@@ -305,7 +312,7 @@ void GameState::FadeInEffect()
 void GameState::NextPlayer()
 {
 
-	if(activeplayerid != -1) //first iteration AccessViolation exception
+	if (activeplayerid != -1) //first iteration AccessViolation exception
 		players[activeplayerid]->QuitShooting();
 
 	++activeplayerid;
@@ -351,7 +358,7 @@ void GameState::ResetDestructTimer()
 }
 
 bool GameState::DestructionsEnded()
-{	
+{
 	if (std::chrono::high_resolution_clock::now() > destruct_timer)
 	{
 		ResetDestructTimer();
@@ -465,9 +472,9 @@ void GameState::SpawnObstaclesGrid()
 
 	bool super_wide_spawned = false;
 	bool win_spawned = false;
-	int win_spawn_pos = std::floorf( random_win_spawn(GameModule::random_gen) * obstacles_amount_per_wall * obstacles_amount_per_wall *
-		((1.0f * no_spawn_chance )/ (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance)));
-	
+	int win_spawn_pos = std::floorf(random_win_spawn(GameModule::random_gen) * obstacles_amount_per_wall * obstacles_amount_per_wall *
+		((1.0f * no_spawn_chance) / (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance)));
+
 
 	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
 
@@ -484,7 +491,7 @@ void GameState::SpawnObstaclesGrid()
 				super_wide_spawned = false;
 				continue;
 			}
-			
+
 			bool is_position_near_player = false;
 
 			float current_x = -80 + i * object_size;
@@ -494,7 +501,7 @@ void GameState::SpawnObstaclesGrid()
 			{
 				glm::vec3 player_pos = players[i]->GetPosition();
 				if (!(((current_x + player_safe_space_size) < player_pos.x || (current_x - player_safe_space_size) > player_pos.x)
-				|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
+					|| ((current_z + player_safe_space_size) < player_pos.z || (current_z - player_safe_space_size) > player_pos.z)))
 				{
 					is_position_near_player = true;
 					break;
@@ -518,7 +525,7 @@ void GameState::SpawnObstaclesGrid()
 					auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_HEAVY, dynamic_world, pos, scale, explosionRadius);
 					obj->Init();
 					entities.push_back(obj);
-					if (obj->GetScale().x > 1.5) 
+					if (obj->GetScale().x > 1.5)
 						super_wide_spawned = true;
 				}
 				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance)
@@ -542,7 +549,7 @@ void GameState::SpawnObstaclesGrid()
 						win_spawned = true;
 					}
 				}
-			
+
 			}
 		}
 	}
@@ -560,7 +567,7 @@ void GameState::InitGameplay()
 
 	ResetDestructTimer();
 	ResetTurnTimer();
-	
+
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
 		AddPlayer(glm::vec3(i * 15, 0, i * 15), /*"player1"*/playerNames[i], i);
@@ -636,7 +643,7 @@ void GameState::Explosion(btVector3& pos, double radius)
 			pos, glm::vec3(1, 1, 1), 0);
 		obj->Init();
 		entities.push_back(obj);
-		obj->GetRigidBody()->applyCentralImpulse(btVector3(random(GameModule::random_gen), 10, 
+		obj->GetRigidBody()->applyCentralImpulse(btVector3(random(GameModule::random_gen), 10,
 			random(GameModule::random_gen)));
 	}
 
@@ -670,7 +677,7 @@ void GameState::CheckTriggers()
 				if (obj0->GetType() == EntityType::OBSTACLE_WIN_CONDITION || obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 					continue;
 
-				if (obj0->GetType() == EntityType::EXPLOSION 
+				if (obj0->GetType() == EntityType::EXPLOSION
 					&& (obj1->GetType() == EntityType::OBSTACLE_HEAVY || obj1->GetType() == EntityType::OBSTACLE_EXPLOSIVE || obj1->GetType() == EntityType::OBSTACLE_LIGHT))
 				{
 					obj0->GetOwner()->Destroy();
@@ -713,8 +720,8 @@ void GameState::MainMenuGui()
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait", pos, size));
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait2", pos, size));
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait1", pos, size));
-	
-	
+
+
 
 	pos.x = 0;
 	pos.y = 0;
@@ -722,7 +729,7 @@ void GameState::MainMenuGui()
 
 	gui.push_back(std::make_shared<Mesh>("quad", "start", pos, size));
 	/*
-	
+
 	pos.x = 0;
 	pos.y = 0;
 	size = glm::vec2(1, 1.3);
