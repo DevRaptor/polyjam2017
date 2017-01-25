@@ -87,6 +87,10 @@ private:
 	float start_rotation = 0.0f;
 	bool gameplay = false;
 
+	std::shared_ptr<Mesh> clock;
+	std::shared_ptr<Mesh> arrow;
+	float seconds = 0;
+
 	int point_per_change_bar = 200;
 	int win_points = 1800;
 

@@ -139,5 +139,14 @@ void Renderer::Render(std::shared_ptr<GameState> game_state)
 		game_state->bar->Draw();
 	}
 
+	if (game_state->clock && game_state->arrow && game_state->gameplay)
+	{
+		glUniformMatrix4fv(transform_gui_uniform, 1, GL_FALSE, glm::value_ptr(game_state->clock->GetTransform()));
+		game_state->clock->Draw();
+
+		glUniformMatrix4fv(transform_gui_uniform, 1, GL_FALSE, glm::value_ptr(game_state->arrow->GetTransform()));
+		game_state->arrow->Draw();
+	}
+
 	SDL_GL_SwapWindow(window);
 }

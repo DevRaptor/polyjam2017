@@ -87,11 +87,27 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		if (players[i]->points > win_points)
 		{
 			winner_id = i;
+			players[i]->points = win_points;
 		}
 	}
 
+	
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
+
+
+	static std::chrono::high_resolution_clock::time_point clock_timer = std::chrono::high_resolution_clock::now();
+	if (std::chrono::high_resolution_clock::now() > clock_timer)
+	{
+		clock_timer = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds(100);
+
+		if (arrow)
+		{
+			arrow->rotation =  glm::radians(360.0f / 16.0f) * seconds;
+		}
+
+		seconds += 0.1f;
+	}
 
 	//TURNSYSTEM - stateslike
 	if (players[activeplayerid]->AlreadyShot())
@@ -119,9 +135,11 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		space_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
 
+	static bool init_gameplay = true;
 	if (fade)
 	{
 		gameplay = false;
+		init_gameplay = true;
 		if (fadeout_coef > 0.0f)
 			fadeout_coef -= fadeout_speed * delta;
 
@@ -148,6 +166,12 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	else
 	{
 		gameplay = true;
+
+		if (init_gameplay)
+		{
+			seconds = 0;
+			init_gameplay = false;
+		}
 	}
 
 	if (fadeout_coef <= 0.0f)
@@ -302,7 +326,6 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << "player " << i << " has: " << players[i]->points << "\n";
 		}
 
-		
 
 		points_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
@@ -332,7 +355,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				frame->rotation -= 1.0f;
 				bar->SetPosition(glm::vec3(bar->position.x - (float)point_shift / 22.0f, default_bar_pos.y, 0.0f));
 
-				if (frame->rotation <= start_rotation - 22.0f)
+				if (frame->rotation <= start_rotation - 22.0f && last_bar_pos.x <= x)
 				{
 					last_bar_pos.x = x;
 					frame_rotating = false;
@@ -807,6 +830,18 @@ void GameState::MainMenuGui()
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait1", pos, size));
 
 
+	pos.x = -0.8f;
+	pos.y = 0.7f;
+	size = glm::vec2(0.15, 0.15 * res_ratio);
+	clock = std::make_shared<Mesh>("quad", "clock", pos, size);
+	arrow = std::make_shared<Mesh>("quad", "arrow", pos, size);
+
+	pos.x = 0.8f;
+	pos.y = -0.5f;
+	size = glm::vec2(0.2, 0.2 * res_ratio);
+	frame = std::make_shared<Mesh>("quad", "frame", pos, size);
+
+
 
 	pos.x = 0;
 	pos.y = 0;
@@ -849,6 +884,8 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 		last_bar_pos.x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / point_per_change_bar);
 		start_rotation = bar->rotation;
 	}
+
+	seconds = 0;
 }
 
 void GameState::WinScreen()
