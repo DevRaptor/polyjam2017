@@ -83,7 +83,7 @@ Obstacle::Obstacle(EntityType obj_type, std::shared_ptr<btDiscreteDynamicsWorld>
 	}
 	else if (type == EntityType::OBSTACLE_WIN_CONDITION)
 	{
-		points = 0;
+		points = GameModule::resources->GetIntParameter("treasurepoints");
 		mesh = GameModule::resources->GetMesh("FIND IT");
 	}
 }
