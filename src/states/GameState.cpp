@@ -321,7 +321,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			float x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / point_per_change_bar);
 
 
-			if (last_bar_pos.x != x && frame_rotating == false)
+			if (last_bar_pos.x > x && frame_rotating == false) // or != x //WARNING
 			{
 				frame_rotating = true;
 				start_rotation = frame->rotation;
