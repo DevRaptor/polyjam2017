@@ -87,6 +87,9 @@ private:
 	float start_rotation = 0.0f;
 	bool gameplay = false;
 
+	int point_per_change_bar = 200;
+	int win_points = 1800;
+
 	std::shared_ptr<Mesh> portrait = nullptr;
 
 	float res_ratio;

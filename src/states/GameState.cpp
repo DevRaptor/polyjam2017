@@ -84,7 +84,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 	for (int i = 0; i < players.size(); i++)
 	{
-		if (players[i]->points > 3000)
+		if (players[i]->points > win_points)
 		{
 			winner_id = i;
 		}
@@ -302,9 +302,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << "player " << i << " has: " << players[i]->points << "\n";
 		}
 
-		players[activeplayerid]->points += 3100;
+		
 
 		points_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+	}
+
+	if (GameModule::input->GetKeyState(SDL_SCANCODE_F12))
+	{
+		players[activeplayerid]->points += 300;
 	}
 
 	if (gameplay)
@@ -313,7 +318,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 
 		if (bar)
 		{
-			float x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / 100);
+			float x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / point_per_change_bar);
 
 
 			if (last_bar_pos.x != x && frame_rotating == false)
@@ -832,7 +837,7 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 		next_player = nullptr;
 		portrait = portraits[player_id];	
 		bar = bars[player_id];
-		last_bar_pos.x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / 100);
+		last_bar_pos.x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / point_per_change_bar);
 		start_rotation = bar->rotation;
 	}
 }
