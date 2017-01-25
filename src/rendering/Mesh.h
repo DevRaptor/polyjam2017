@@ -23,8 +23,15 @@ public:
 
 	void Draw();
 	void SetPosition(glm::vec3 pos);
+	void SetRotation(float value) { rotation = value; }
+
+	void Move(float x, float y, float z = 0.0f) { position.x += x; position.y += y; position.z += z; }
 
 	glm::mat4 GetTransform();
+
+	glm::vec3 position;
+	float rotation = 0.0f; //in degrees
+
 
 private:
 	int vertex_amount;
@@ -36,7 +43,7 @@ private:
 
 	GLuint texture;
 
-	glm::vec3 position;
+	glm::vec2 scale;
 
 	bool LoadOBJ(const std::string& file_name,
 		std::vector<glm::vec3>& out_vertices,

@@ -293,7 +293,38 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << "player " << i << " has: " << players[i]->points << "\n";
 		}
 
+		players[activeplayerid]->points += 100;
+
 		points_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
+	}
+
+	if (gameplay)
+	{
+		//compute points on bar
+
+		if (bar)
+		{
+			float x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / 100);
+
+
+			if (last_bar_pos.x != x && frame_rotating == false)
+			{
+				frame_rotating = true;
+				start_rotation = frame->rotation;
+			}
+
+			if (frame_rotating)
+			{
+				frame->rotation -= 1.0f;
+				bar->SetPosition(glm::vec3(bar->position.x - (float)point_shift / 22.0f, default_bar_pos.y, 0.0f));
+
+				if (frame->rotation <= start_rotation - 22.0f)
+				{
+					last_bar_pos.x = x;
+					frame_rotating = false;
+				}
+			}
+		}
 	}
 
 	if (players.size() > 0)
@@ -726,13 +757,27 @@ void GameState::MainMenuGui()
 
 	pos.x = 0.8f;
 	pos.y = -0.5f;
-
 	size = glm::vec2(0.2, 0.2 * res_ratio);
-
-	//frame = std::make_shared<Mesh>("quad", "frame", pos, size);
-
 	frame = std::make_shared<Mesh>("quad", "frame", pos, size);
+	
 
+	pos.x = 1.91f;
+	pos.y = -0.84f;
+	default_bar_pos = pos;
+	last_bar_pos = pos;
+	size = glm::vec2(1.3f, 0.025f * res_ratio);
+	bars.push_back(std::make_shared<Mesh>("quad", "bar", pos, size));
+	bars.push_back(std::make_shared<Mesh>("quad", "bar", pos, size));
+	bars.push_back(std::make_shared<Mesh>("quad", "bar", pos, size));
+	bars.push_back(std::make_shared<Mesh>("quad", "bar", pos, size));
+
+
+	point_shift = 0.2f;
+
+
+	pos.x = 0.8f;
+	pos.y = -0.5f;
+	size = glm::vec2(0.2, 0.2 * res_ratio);
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait3", pos, size));
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait", pos, size));
 	portraits.push_back(std::make_shared<Mesh>("quad", "portrait2", pos, size));
@@ -776,7 +821,9 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 	{
 		next_player = nullptr;
 		portrait = portraits[player_id];	
-		
+		bar = bars[player_id];
+		last_bar_pos.x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / 100);
+		start_rotation = bar->rotation;
 	}
 }
 

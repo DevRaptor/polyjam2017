@@ -6,6 +6,9 @@
 
 #include "utility/Log.h"
 
+#include <glm/gtc/matrix_transform.hpp> 
+#include <glm/gtx/transform.hpp>
+
 Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 {
 	std::vector<glm::vec3> vertices;
@@ -98,6 +101,7 @@ Mesh::Mesh(const std::string& model_name, glm::vec3 pos)
 Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 pos, glm::vec2 size)
 {
 	SetPosition(glm::vec3(pos.x, pos.y, 0));
+	scale = size;
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
@@ -139,12 +143,12 @@ Mesh::Mesh(const std::string& model_name, const std::string& texture, glm::vec2 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
 
 	vertex_amount = vertices.size();
-	
+	/*
 	for (glm::vec3& vertex : vertices)
 	{
 		vertex.x *= size.x;
 		vertex.y *= size.y;
-	}
+	}*/
 	
 
 	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
@@ -215,7 +219,12 @@ void Mesh::SetPosition(glm::vec3 pos)
 
 glm::mat4 Mesh::GetTransform()
 {
-	return glm::translate(glm::mat4(1.0f), position);
+	glm::mat4 mv = glm::translate(glm::mat4(1.0f), position);
+
+	mv = glm::scale(mv, glm::vec3(scale.x, scale.y, 1.0f));
+	mv = glm::rotate(mv, rotation, glm::vec3(0, 0, -1));
+	
+	return mv;
 }
 
 bool Mesh::LoadOBJ(const std::string& file_name,
