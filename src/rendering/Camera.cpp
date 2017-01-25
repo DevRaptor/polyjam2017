@@ -75,8 +75,6 @@ glm::vec3 Camera::GetRight()
 void Camera::Move(const glm::vec3& direction)
 {
 	position += glm::vec3(rotation * glm::vec4(direction, 1));
-
-	std::cout << position.x << " " << position.y << " " << position.z << "\n";
 }
 
 void Camera::Rotate(const glm::quat &rot) 

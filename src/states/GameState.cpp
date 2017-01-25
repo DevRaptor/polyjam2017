@@ -332,8 +332,8 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		camera.Shake();
 
-		if(GameModule::input->GetKeyState(SDL_SCANCODE_B))
-		std::cout << "PL: " << players[activeplayerid]->GetPosition().x << " " << players[activeplayerid]->GetPosition().y << " " << players[activeplayerid]->GetPosition().z << "\n";
+		//if(GameModule::input->GetKeyState(SDL_SCANCODE_B))
+		//std::cout << "PL: " << players[activeplayerid]->GetPosition().x << " " << players[activeplayerid]->GetPosition().y << " " << players[activeplayerid]->GetPosition().z << "\n";
 		//std::cout << "CAM: " << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z << "\n";
 
 		//camera.LookAt(players.front()->GetPosition());
@@ -483,7 +483,6 @@ void GameState::SpawnObstaclesGrid()
 	0,0,0 is player spawn - don't spawn here
 	*/
 	int obstacles_amount_per_wall = GameModule::resources->GetIntParameter("obstacles_amount");// 30;
-
 	// How far from each side from any player obstacles can't spawn
 	float player_safe_space_size = 5;
 
@@ -618,7 +617,7 @@ void GameState::InitGameplay()
 	for (int i = 0; i < GameModule::resources->GetIntParameter("playersamount"); i++)
 	{
 		AddPlayer(glm::vec3((i * limit) % (limit * 2), 0, ((i*limit)/(limit*2)) * limit), playerNames[i], i);
-		std::cout << i << ": " << (i * limit) % (limit * 2) << " " << ((i*limit) / (limit * 2)) * limit << "\n";
+		//std::cout << i << ": " << (i * limit) % (limit * 2) << " " << ((i*limit) / (limit * 2)) * limit << "\n";
 	}
 
 	activeplayerid = 0;

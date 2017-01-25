@@ -171,7 +171,7 @@ void Ship::Shoot()
 	glm::vec3 up(-1, 0, 0);
 
 	double angleRot = angle;
-	std::cout << glm::degrees(angleRot) << "\n";
+	//std::cout << glm::degrees(angleRot) << "\n";
 
 	glm::vec3 direction;
 	direction[1] = 0;
@@ -179,7 +179,7 @@ void Ship::Shoot()
 	direction[0] = up[2] * sin(angleRot) + up[0] * cos(angleRot);
 	glm::normalize(direction);
 
-	std::cout << direction[0] << " " << direction[1] << " " << direction[2] << "\n";
+	//std::cout << direction[0] << " " << direction[1] << " " << direction[2] << "\n";
 
 	glm::vec3 pos(vec.getX() + 2*direction[0], vec.getY(), vec.getZ() + 2*direction[2]);
 

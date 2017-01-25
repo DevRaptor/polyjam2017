@@ -70,7 +70,6 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 		{
 			static_cast<Ship*>(own_obj0->GetOwner().get())->SetIsEnabled(false);
 			own_obj1->GetOwner()->Destroy();
-			std::cout << "Bullet\n";
 			return 0;
 		}
 		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::BULLET)
