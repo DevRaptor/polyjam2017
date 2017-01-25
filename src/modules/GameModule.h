@@ -15,5 +15,8 @@ public:
 	static std::shared_ptr<Audio> audio;
 	static std::mt19937 random_gen;
 
+	static int winposx;
+	static int winposy;
+
 	static void Init();
 };

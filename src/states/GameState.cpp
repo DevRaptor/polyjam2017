@@ -295,7 +295,8 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 		camera.Translate(players[activeplayerid]->GetPosition() + glm::vec3(0, 10, 0));
 		camera.Shake();
 
-		//std::cout << "PL: " << players[activeplayerid]->GetPosition().x << " " << players[activeplayerid]->GetPosition().y << " " << players[activeplayerid]->GetPosition().z << "\n";
+		if(GameModule::input->GetKeyState(SDL_SCANCODE_B))
+		std::cout << "PL: " << players[activeplayerid]->GetPosition().x << " " << players[activeplayerid]->GetPosition().y << " " << players[activeplayerid]->GetPosition().z << "\n";
 		//std::cout << "CAM: " << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z << "\n";
 
 		//camera.LookAt(players.front()->GetPosition());
@@ -456,8 +457,9 @@ void GameState::SpawnObstaclesGrid()
 	int light_spawn_chance = GameModule::resources->GetIntParameter("light_spawn_chance");
 	int heavy_spawn_chance = GameModule::resources->GetIntParameter("heavy_spawn_chance");
 	int expl_spawn_chance = GameModule::resources->GetIntParameter("expl_spawn_chance");
+	int hint_spawn_chance = GameModule::resources->GetIntParameter("hint_spawn_chance");
 
-	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance));
+	std::uniform_int_distribution<> random_spawner(0, (no_spawn_chance + light_spawn_chance + heavy_spawn_chance + expl_spawn_chance+ hint_spawn_chance));
 	std::uniform_real_distribution<> random_position(-100, 100);
 	std::uniform_real_distribution<> random_win_spawn(0.0f, 0.6f);
 
@@ -467,7 +469,7 @@ void GameState::SpawnObstaclesGrid()
 	bool super_wide_spawned = false;
 	bool win_spawned = false;
 	int win_spawn_pos = std::floorf(random_win_spawn(GameModule::random_gen) * obstacles_amount_per_wall * obstacles_amount_per_wall *
-		((1.0f * no_spawn_chance) / (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance)));
+		((1.0f * no_spawn_chance) / (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance + hint_spawn_chance)));
 
 
 	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
@@ -530,6 +532,12 @@ void GameState::SpawnObstaclesGrid()
 					if (obj->GetScale().x > 1.5)
 						super_wide_spawned = true;
 				}
+				else if (rand_obstacle_type < expl_spawn_chance + heavy_spawn_chance + light_spawn_chance + hint_spawn_chance)
+				{
+					auto obj = std::make_shared<Obstacle>(EntityType::HINT, dynamic_world, pos, scale, explosionRadius);
+					obj->Init();
+					entities.push_back(obj);
+				}
 				else
 				{
 					if (win_spawn_pos > 0)
@@ -540,6 +548,8 @@ void GameState::SpawnObstaclesGrid()
 						obj->Init();
 						entities.push_back(obj);
 						std::cout << "Win spawned at " << pos.x << " " << pos.z << "\n";
+						GameModule::winposx = pos.x;
+						GameModule::winposy = pos.z;
 						win_spawned = true;
 					}
 				}

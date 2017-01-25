@@ -15,6 +15,8 @@ public:
 	void SetWinningPlayerID(int id) { winningPlayerID = id; }
 	int GetWinningPlayerID() { return winningPlayerID; }
 
+	void ShowWay();
+
 private:
 	std::chrono::high_resolution_clock::time_point spawnTime;
 	int winningPlayerID;

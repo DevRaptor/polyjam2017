@@ -7,6 +7,9 @@ std::shared_ptr<Input> GameModule::input;
 std::shared_ptr<ResourceManager> GameModule::resources;
 std::mt19937 GameModule::random_gen;
 
+int GameModule::winposx = 0;
+int GameModule::winposy = 0;
+
 void GameModule::Init()
 {
 	input = std::make_shared<Input>();

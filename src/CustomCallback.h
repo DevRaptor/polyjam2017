@@ -17,9 +17,20 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 	{
 		const RigidBody* own_obj0 = static_cast<const RigidBody*>(obj0->getCollisionObject());
 		const RigidBody* own_obj1 = static_cast<const RigidBody*>(obj1->getCollisionObject());
-
-		//bullet can collide only with meteor, so must add point
 		
+		if (own_obj0->GetType() == EntityType::SHIP && own_obj1->GetType() == EntityType::HINT)
+		{
+			auto hint = static_cast<Obstacle*>(own_obj1->GetOwner().get());
+			hint->ShowWay();
+			return 0;
+		}
+		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::HINT)
+		{
+			auto hint = static_cast<Obstacle*>(own_obj0->GetOwner().get());
+			hint->ShowWay();
+			return 0;
+		}
+
 		if (own_obj0->GetType() == EntityType::BULLET && own_obj1->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
 			//static_cast<Ship*>(own_obj0->GetOwner().get())->SetHasWon(true);
@@ -59,6 +70,7 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 		{
 			static_cast<Ship*>(own_obj0->GetOwner().get())->SetIsEnabled(false);
 			own_obj1->GetOwner()->Destroy();
+			std::cout << "Bullet\n";
 			return 0;
 		}
 		else if (own_obj1->GetType() == EntityType::SHIP && own_obj0->GetType() == EntityType::BULLET)
@@ -66,9 +78,7 @@ struct CustomCallback : public btCollisionWorld::ContactResultCallback
 			static_cast<Ship*>(own_obj1->GetOwner().get())->SetIsEnabled(false);
 			own_obj0->GetOwner()->Destroy();
 			return 0;
-		}
-
-		
+		}			
 
 		own_obj0->GetOwner()->Destroy();
 		own_obj1->GetOwner()->Destroy();
