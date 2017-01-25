@@ -76,8 +76,20 @@ private:
 	std::shared_ptr<Mesh> next_player;
 
 	std::vector<std::shared_ptr<Mesh>> portraits;
+	std::shared_ptr<Mesh> frame;
+	
+	std::vector<std::shared_ptr<Mesh>> bars;
+	std::shared_ptr<Mesh> bar;
+	glm::vec2 default_bar_pos;
+	glm::vec2 last_bar_pos;
+	bool frame_rotating = false;
+	float point_shift; //bar shift for every 100 points
+	float start_rotation = 0.0f;
+	bool gameplay = false;
 
 	std::shared_ptr<Mesh> portrait = nullptr;
+
+	float res_ratio;
 
 	bool start = true;
 	int winner_id = -1;

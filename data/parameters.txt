@@ -21,6 +21,7 @@ meteor_max_distortion=2.0
 meteor_delay=2000
 meteor_delay_min=50
 obstaclerotation=1
+
 obstacles_amount=40
 no_spawn_chance=20
 light_spawn_chance=30
