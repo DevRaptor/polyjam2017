@@ -16,6 +16,7 @@ enum class EntityType
 	PARTICLE, //obstacle class
 	BULLET,
 	EXPLOSION,
+	HINT,
 	NONE
 };
 
