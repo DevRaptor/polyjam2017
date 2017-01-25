@@ -440,7 +440,7 @@ void GameState::SpawnObstaclesRand()
 	glm::vec3 scale(1, 1, 1);
 
 
-	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
+	static const double explosionRadius = GameModule::resources->GetFloatParameter("explosion_radius");//3;
 
 	for (int i = 0; i <= obstacles_amount; i++)
 	{
@@ -522,7 +522,7 @@ void GameState::SpawnObstaclesGrid()
 		((1.0f * no_spawn_chance) / (light_spawn_chance + heavy_spawn_chance + expl_spawn_chance + no_spawn_chance + hint_spawn_chance)));
 
 
-	static const double explosionRadius = GameModule::resources->GetIntParameter("explosion_radius");//3;
+	static const double explosionRadius = GameModule::resources->GetFloatParameter("explosion_radius");//3;
 
 //	auto obj = std::make_shared<Obstacle>(EntityType::OBSTACLE_WIN_CONDITION, dynamic_world, glm::vec3(2,0,2), scale, explosionRadius);
 //	obj->Init();

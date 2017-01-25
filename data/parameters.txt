@@ -35,5 +35,5 @@ shake_duration=500
 explosion_delay=50
 particles_quantity=8
 particlelifetime=3000
-explosion_radius=3
+explosion_radius=3.5
 quotes=2
