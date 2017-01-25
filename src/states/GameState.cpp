@@ -82,6 +82,14 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			return;
 	}
 
+	for (int i = 0; i < players.size(); i++)
+	{
+		if (players[i]->points > 3000)
+		{
+			winner_id = i;
+		}
+	}
+
 	float delta = delta_time.count() / 1000.0f; //in seconds
 	dynamic_world->stepSimulation(delta, 10);
 
@@ -222,6 +230,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	auto it = entities.begin();
 	while (it != entities.end())
 	{
+		/*
 		if ((*it)->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
 			auto winCondition = static_cast<Obstacle*>(it->get());
@@ -235,7 +244,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			}
 
 			//exit(0);
-		}
+		}*/
 
 		if ((*it)->IsDestroyed())
 		{
@@ -293,7 +302,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			std::cout << "player " << i << " has: " << players[i]->points << "\n";
 		}
 
-		players[activeplayerid]->points += 100;
+		players[activeplayerid]->points += 3100;
 
 		points_timer = std::chrono::high_resolution_clock::now() + std::chrono::seconds(1);
 	}
@@ -808,9 +817,10 @@ void GameState::ShowNextPlayer(bool show, int player_id)
 		next_player = players_graphics[player_id];
 		portrait = nullptr;
 		
-
-		if (winner_id != -1)
+		static bool must_init_win = true;
+		if (winner_id != -1 && must_init_win)
 		{
+			must_init_win = false;
 			glm::vec2 pos(0, 0);
 			glm::vec2 size(0.8, 1.05);
 
@@ -831,6 +841,11 @@ void GameState::WinScreen()
 {
 	//next_player = players_graphics[winner_id];
 //	gui.push_back(std::make_shared<Mesh>("quad", "win3", pos, size));
+
+	if (winner_id > 0)
+		winner_id--;
+	else
+		winner_id = players.size() - 1;
 
 	ShowNextPlayer(true, winner_id);
 }

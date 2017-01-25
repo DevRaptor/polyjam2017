@@ -122,6 +122,8 @@ void Obstacle::Init()
 	//to avoid render on start in world center
 	transform_mat = physic_body->GetTransformMatrix();
 	Rotate(glm::radians(90.0));
+
+	physic_body->body->setDamping(0.5f, 0.5f);
 }
 
 void Obstacle::Update()
