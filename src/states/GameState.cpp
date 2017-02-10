@@ -254,8 +254,8 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 	auto it = entities.begin();
 	while (it != entities.end())
 	{
-		/*
-		if ((*it)->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
+		
+		/*if ((*it)->GetType() == EntityType::OBSTACLE_WIN_CONDITION)
 		{
 			auto winCondition = static_cast<Obstacle*>(it->get());
 			int winningPlayer = winCondition->GetWinningPlayerID();
@@ -344,7 +344,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 			float x = default_bar_pos.x - point_shift * (players[activeplayerid]->points / point_per_change_bar);
 
 
-			if (last_bar_pos.x > x && frame_rotating == false) // or != x //WARNING
+			if (last_bar_pos.x != x && frame_rotating == false) // or != x //WARNING
 			{
 				frame_rotating = true;
 				start_rotation = frame->rotation;
@@ -355,7 +355,7 @@ void GameState::Update(std::chrono::milliseconds delta_time)
 				frame->rotation -= 1.0f;
 				bar->SetPosition(glm::vec3(bar->position.x - (float)point_shift / 22.0f, default_bar_pos.y, 0.0f));
 
-				if (frame->rotation <= start_rotation - 22.0f && last_bar_pos.x <= x)
+				if (frame->rotation <= start_rotation - 22.0f)// && last_bar_pos.x <= x)
 				{
 					last_bar_pos.x = x;
 					frame_rotating = false;
@@ -893,10 +893,10 @@ void GameState::WinScreen()
 	//next_player = players_graphics[winner_id];
 //	gui.push_back(std::make_shared<Mesh>("quad", "win3", pos, size));
 
-	if (winner_id > 0)
+	/*if (winner_id > 0)
 		winner_id--;
-	else
-		winner_id = players.size() - 1;
+	else11
+		winner_id = players.size() - 1;*/
 
-	ShowNextPlayer(true, winner_id);
+	ShowNextPlayer(true, (winner_id - 1) % players.size());
 }
